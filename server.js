@@ -90,6 +90,18 @@ app.get('/cart', (req, res) => {
   res.render('cart');
 });
 
+// Individual product page
+app.get('/product/:id', (req, res) => {
+  const productId = parseInt(req.params.id);
+  const product = productList.find(p => p.id === productId);
+
+  if (product) {
+    res.render('product-detail', { product });
+  } else {
+    res.status(404).send('Product not found');
+  }
+});
+
 // Admin settings routes
 app.get('/admin/settings', (req, res) => {
   if (req.headers.accept && req.headers.accept.includes('application/json')) {

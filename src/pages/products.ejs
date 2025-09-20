@@ -417,7 +417,7 @@
             </div>
             <div class="products-grid">
                 <% products.forEach(product => { %>
-                    <div class="product-card">
+                    <div class="product-card" onclick="window.location.href='/product/<%= product.id %>'" style="cursor: pointer;">
                         <div class="product-image">
                             <% if (product.image && product.image.startsWith('/images/')) { %>
                                 <img src="<%= product.image %>" alt="<%= product.name %>" onerror="this.style.display='none'; this.parentNode.innerHTML='🥩 <%= product.name.substring(0, 25) %>...';">
@@ -432,7 +432,7 @@
                             <div class="product-price">£<%= product.price.toFixed(2) %></div>
                             <div class="product-actions">
                                 <% if (product.status === 'in_stock') { %>
-                                    <button class="add-to-cart-btn" onclick="addToCart('<%= product.id %>', '<%= product.name.replace(/'/g, '\\\'') %>', <%= product.price %>)">
+                                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('<%= product.id %>', '<%= product.name.replace(/'/g, '\\\'') %>', <%= product.price %>)">
                                         <i class="fas fa-shopping-cart"></i> Add to Cart
                                     </button>
                                 <% } else { %>
