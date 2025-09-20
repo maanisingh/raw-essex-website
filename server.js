@@ -51,9 +51,6 @@ let shippingSettings = {
   dhl: { enabled: false, apiKey: '', pricePerKg: 7.99, freeShippingThreshold: 75 },
   royalMail: { enabled: true, apiKey: '', pricePerKg: 3.99, freeShippingThreshold: 30 }
 };
-let paymentSettings = {
-  stripe: { enabled: false, publicKey: '', secretKey: '' }
-};
 
 // Website routes
 app.get('/', (req, res) => {
