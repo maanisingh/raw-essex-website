@@ -3,69 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raw Essex - Premium Raw Pet Food</title>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Questrial:wght@400&display=swap" rel="stylesheet">
+    <title>Raw Essex - Premium Raw Pet Food | Luxury Natural Nutrition</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Questrial', Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
-            color: #1a4c24;
-            background-color: #f8fdf9;
+            color: #1a202c;
+            overflow-x: hidden;
         }
-        .header {
-            background: linear-gradient(135deg, #1a4c24, #2d7c47);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 4px 20px rgba(26, 76, 36, 0.3);
+
+        /* Premium Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.1);
         }
+
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px 40px;
         }
+
         .logo {
             display: flex;
             align-items: center;
-            font-family: 'Archivo', sans-serif;
-            font-size: 1.8rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
             font-weight: 700;
+            color: #1a4c24;
         }
+
         .logo img {
-            height: 50px;
-            margin-right: 15px;
-            border-radius: 10px;
+            height: 60px;
+            margin-right: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
+
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
-            font-family: 'Archivo', sans-serif;
+            gap: 3rem;
+            font-weight: 500;
         }
+
         .nav-links a {
-            color: white;
+            color: #1a4c24;
             text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-            padding: 10px 15px;
-            border-radius: 25px;
-            transition: all 0.3s;
-        }
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.2);
-            color: #7dd87f;
-        }
-        .hero {
-            background: linear-gradient(135deg, rgba(26, 76, 36, 0.9), rgba(45, 124, 71, 0.9)),
-                        url('/images/hero-pet.jpg') center/cover;
-            color: white;
-            padding: 6rem 0;
-            text-align: center;
+            padding: 12px 24px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
             position: relative;
         }
+
+        .nav-links a:hover {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1a4c24 50%, #22c55e 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
         .hero::before {
             content: '';
             position: absolute;
@@ -73,241 +94,364 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(26, 76, 36, 0.7), rgba(45, 124, 71, 0.7));
+            background: url('https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80') center/cover;
+            opacity: 0.15;
             z-index: 1;
         }
+
         .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
             position: relative;
             z-index: 2;
         }
-        .hero h1 {
-            font-family: 'Archivo', sans-serif;
-            font-size: 4rem;
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .hero p {
-            font-size: 1.4rem;
-            margin-bottom: 3rem;
-            opacity: 0.95;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        .btn {
-            display: inline-block;
-            padding: 18px 40px;
-            background: linear-gradient(135deg, #4ade80, #22c55e);
             color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s;
-            font-family: 'Archivo', sans-serif;
-            font-weight: 600;
-            font-size: 1.1rem;
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.5s forwards;
         }
-        .btn:hover {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(34, 197, 94, 0.6);
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .section { padding: 5rem 0; }
-        .section h2 {
-            text-align: center;
+
+        .hero-text p {
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.9);
             margin-bottom: 3rem;
-            font-size: 3rem;
-            color: #1a4c24;
-            font-family: 'Archivo', sans-serif;
-            font-weight: 700;
+            font-weight: 300;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.7s forwards;
         }
-        .products-grid {
+
+        .hero-buttons {
+            display: flex;
+            gap: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.9s forwards;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 18px 40px;
+            border: 2px solid white;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #1a4c24;
+            transform: translateY(-3px);
+        }
+
+        .hero-image {
+            position: relative;
+            opacity: 0;
+            animation: fadeInRight 1s ease 0.5s forwards;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Premium Features Section */
+        .features {
+            padding: 120px 40px;
+            background: white;
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: #1a4c24;
+            margin-bottom: 2rem;
+        }
+
+        .section-header p {
+            font-size: 1.3rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 3rem;
-            margin-bottom: 4rem;
+            gap: 40px;
         }
-        .product-card {
+
+        .feature-card {
             background: white;
+            padding: 50px;
             border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
-            overflow: hidden;
-            transition: all 0.4s;
-            border: 2px solid transparent;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(34, 197, 94, 0.1);
         }
-        .product-card:hover {
+
+        .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(26, 76, 36, 0.2);
-            border-color: #4ade80;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
-        .product-image {
-            height: 250px;
-            background: linear-gradient(45deg, #f0fdf4, #dcfce7);
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
             color: #1a4c24;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Product Showcase */
+        .product-showcase {
+            padding: 120px 40px;
+            background: linear-gradient(135deg, #f8fdf9, #ecfdf5);
+        }
+
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            height: 250px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
             position: relative;
             overflow: hidden;
         }
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+
+        .product-content {
+            padding: 30px;
         }
-        .product-card:hover .product-image img {
-            transform: scale(1.05);
-        }
-        .product-info { padding: 2.5rem; }
-        .product-info h3 {
-            margin-bottom: 1rem;
+
+        .product-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             color: #1a4c24;
-            font-family: 'Archivo', sans-serif;
-            font-weight: 700;
-            font-size: 1.3rem;
-            line-height: 1.3;
+            margin-bottom: 15px;
         }
-        .product-description {
-            color: #4b5563;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
+
         .product-price {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #16a34a;
-            margin: 1rem 0;
-            font-family: 'Archivo', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #22c55e;
+            margin-top: 15px;
         }
-        .product-status {
-            padding: 0.5rem 1.2rem;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            font-family: 'Archivo', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .in_stock {
-            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-            color: #166534;
-            border: 1px solid #22c55e;
-        }
-        .out_of_stock {
-            background: linear-gradient(135deg, #fef2f2, #fee2e2);
-            color: #dc2626;
-            border: 1px solid #ef4444;
-        }
-        .categories {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 4rem;
-            flex-wrap: wrap;
-        }
-        .category-btn {
-            padding: 1rem 2rem;
-            background: white;
-            color: #1a4c24;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s;
-            font-family: 'Archivo', sans-serif;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(26, 76, 36, 0.1);
-            border: 2px solid transparent;
-        }
-        .category-btn:hover, .category-btn.active {
-            background: linear-gradient(135deg, #4ade80, #22c55e);
+
+        /* Testimonials */
+        .testimonials {
+            padding: 120px 40px;
+            background: #1a4c24;
             color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
-            border-color: #16a34a;
         }
-        .footer {
-            background: linear-gradient(135deg, #1a4c24, #2d7c47);
-            color: white;
+
+        .testimonials-container {
+            max-width: 1400px;
+            margin: 0 auto;
             text-align: center;
-            padding: 4rem 0;
         }
-        .stats-section {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            padding: 4rem 0;
-            margin: 3rem 0;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
+
+        .testimonials h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 80px;
         }
-        .stats-grid {
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .testimonial-card {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .testimonial-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 80px 40px;
+            background: white;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
+            gap: 40px;
             text-align: center;
         }
-        .stat-item {
-            padding: 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(26, 76, 36, 0.1);
-            transition: transform 0.3s;
+
+        .stat-card {
+            padding: 40px 20px;
         }
-        .stat-item:hover {
-            transform: translateY(-5px);
-        }
-        .stat-item h3 {
-            font-size: 3rem;
-            color: #16a34a;
-            font-family: 'Archivo', sans-serif;
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            color: #22c55e;
+            margin-bottom: 10px;
         }
-        .stat-item p {
-            color: #1a4c24;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .pet-showcase {
-            background: linear-gradient(135deg, rgba(240, 253, 244, 0.9), rgba(220, 252, 231, 0.9)),
-                        url('/images/pet-showcase.jpg') center/cover;
-            padding: 5rem 0;
-            text-align: center;
-            margin: 3rem 0;
-            border-radius: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-        .pet-showcase::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(26, 76, 36, 0.1), rgba(45, 124, 71, 0.1));
-            z-index: 1;
-        }
-        .pet-showcase-content {
-            position: relative;
-            z-index: 2;
-        }
-        .pet-showcase h2 {
-            color: #1a4c24;
-            margin-bottom: 2rem;
-        }
-        .pet-showcase p {
+
+        .stat-label {
             font-size: 1.2rem;
-            color: #374151;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .hero-text h1 {
+                font-size: 3rem;
+            }
+
+            .nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="header">
+    <!-- Navigation -->
+    <div class="nav-container">
         <nav class="nav">
             <div class="logo">
                 <img src="/images/raw-essex-logo.jpg" alt="Raw Essex Logo">
@@ -316,97 +460,160 @@
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/products">All Products</a></li>
+                <li><a href="/faq">FAQ & Education</a></li>
                 <li><a href="/admin">Admin Panel</a></li>
             </ul>
         </nav>
-    </header>
+    </div>
 
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Premium Raw Pet Food</h1>
-                <p>Natural, wholesome nutrition for your beloved companions - because they deserve the very best</p>
-                <a href="/products" class="btn">Discover Our Range</a>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Premium Raw<br>Nutrition for<br>Your Best Friend</h1>
+                <p>Discover the luxury of natural feeding with our carefully crafted raw meals. Because your pet deserves the finest ingredients nature has to offer.</p>
+                <div class="hero-buttons">
+                    <a href="/products" class="btn-primary">Explore Products</a>
+                    <a href="/faq" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Happy dogs enjoying raw food">
             </div>
         </div>
     </section>
 
-    <section class="section">
-        <div class="container">
-            <div class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <h3><%= products.length %></h3>
-                        <p>Premium Products</p>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="section-header">
+                <h2>Why Choose Raw Essex?</h2>
+                <p>We believe in providing nothing but the best for your beloved pets. Our commitment to quality and natural nutrition sets us apart.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
                     </div>
-                    <div class="stat-item">
-                        <h3>8</h3>
-                        <p>Product Categories</p>
+                    <h3>100% Natural</h3>
+                    <p>All our products are made from premium, natural ingredients sourced from trusted British farms.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-award"></i>
                     </div>
-                    <div class="stat-item">
-                        <h3>100%</h3>
-                        <p>Natural & Raw</p>
+                    <h3>Premium Quality</h3>
+                    <p>Every meal is crafted to the highest standards, ensuring your pet receives optimal nutrition.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
                     </div>
-                    <div class="stat-item">
-                        <h3>★★★★★</h3>
-                        <p>Premium Quality</p>
-                    </div>
+                    <h3>Made with Love</h3>
+                    <p>Our passion for pet health drives everything we do, from sourcing to delivery.</p>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="pet-showcase">
-                <div class="pet-showcase-content">
-                    <h2>Trusted by Pet Lovers Everywhere</h2>
-                    <p>Our premium raw food supports healthy digestion, shiny coats, and boundless energy for dogs, cats, and other beloved pets.</p>
-                    <a href="/products" class="btn">Shop by Pet Type</a>
-                </div>
+    <!-- Product Showcase -->
+    <section class="product-showcase">
+        <div class="showcase-container">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+                <p>Discover our most popular raw meals, loved by pets and trusted by owners across the UK.</p>
             </div>
-
-            <h2>Featured Products</h2>
-
-            <div class="categories">
-                <a href="/products" class="category-btn active">All Products</a>
-                <a href="/products?category=Raw Dog Food" class="category-btn">Raw Dog Food</a>
-                <a href="/products?category=Organ Meats" class="category-btn">Organ Meats</a>
-                <a href="/products?category=Natural Dog Treats" class="category-btn">Natural Dog Treats</a>
-                <a href="/products?category=Dog Supplements" class="category-btn">Dog Supplements</a>
-                <a href="/products?category=Cat Food" class="category-btn">Cat Food</a>
-                <a href="/products?category=Bird Food" class="category-btn">Bird Food</a>
-                <a href="/products?category=Accessories" class="category-btn">Accessories</a>
-            </div>
-
             <div class="products-grid">
                 <% products.slice(0, 6).forEach(product => { %>
-                    <div class="product-card">
-                        <div class="product-image">
-                            <% if (product.image && product.image.startsWith('http')) { %>
-                                <img src="<%= product.image %>" alt="<%= product.name %>" onerror="this.style.display='none'; this.parentNode.innerHTML='🥩 <%= product.name.substring(0, 25) %>...';">
-                            <% } else { %>
-                                <span>🥩 <%= product.name.substring(0, 25) %>...</span>
-                            <% } %>
-                        </div>
-                        <div class="product-info">
-                            <h3><%= product.name %></h3>
-                            <p class="product-description"><%= product.description %></p>
-                            <div class="product-price">£<%= product.price.toFixed(2) %></div>
-                            <span class="product-status <%= product.status %>">
-                                <%= product.status.replace('_', ' ') %>
-                            </span>
-                        </div>
+                <div class="product-card">
+                    <div class="product-image">🥩</div>
+                    <div class="product-content">
+                        <h3><%= product.name %></h3>
+                        <p><%= product.description %></p>
+                        <div class="product-price">£<%= product.price.toFixed(2) %></div>
                     </div>
+                </div>
                 <% }); %>
-            </div>
-
-            <div style="text-align: center;">
-                <a href="/products" class="btn">View All <%= products.length %> Products</a>
             </div>
         </div>
     </section>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Raw Essex. Premium raw pet food and accessories for healthier, happier pets.</p>
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Happy Pets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">81</div>
+                <div class="stat-label">Premium Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Natural Ingredients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5★</div>
+                <div class="stat-label">Customer Rating</div>
+            </div>
         </div>
-    </footer>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="testimonials-container">
+            <h2>What Pet Owners Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The transformation in my dog's energy and coat since switching to Raw Essex has been incredible. The quality is outstanding!"</p>
+                    <div class="testimonial-author">- Sarah M., London</div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Finally found a raw food company that truly cares about quality. My cats have never been healthier or happier."</p>
+                    <div class="testimonial-author">- James K., Manchester</div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The convenience and quality of Raw Essex makes feeding raw so easy. Highly recommend to any pet owner!"</p>
+                    <div class="testimonial-author">- Emma L., Birmingham</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Smooth scrolling navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add scroll effect to navigation
+            window.addEventListener('scroll', function() {
+                const nav = document.querySelector('.nav-container');
+                if (window.scrollY > 100) {
+                    nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                    nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+                } else {
+                    nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                    nav.style.boxShadow = 'none';
+                }
+            });
+
+            // Add loading animation
+            const cards = document.querySelectorAll('.feature-card, .product-card, .testimonial-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
 </body>
 </html>

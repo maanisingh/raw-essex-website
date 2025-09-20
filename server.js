@@ -6,7 +6,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
-const products = require('./src/data/products');
+const products = require('./src/data/expanded-products');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

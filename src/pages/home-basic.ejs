@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Essex - Premium Raw Pet Food</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Questrial:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Questrial', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a4c24;
+            background-color: #f8fdf9;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a4c24, #2d7c47);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(26, 76, 36, 0.3);
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Archivo', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 10px;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            font-family: 'Archivo', sans-serif;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+            color: #7dd87f;
+        }
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 76, 36, 0.9), rgba(45, 124, 71, 0.9)),
+                        url('/images/hero-pet.jpg') center/cover;
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(26, 76, 36, 0.7), rgba(45, 124, 71, 0.7));
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .hero h1 {
+            font-family: 'Archivo', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .btn {
+            display: inline-block;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(34, 197, 94, 0.6);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .section { padding: 5rem 0; }
+        .section h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 3rem;
+            color: #1a4c24;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 700;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
+            overflow: hidden;
+            transition: all 0.4s;
+            border: 2px solid transparent;
+        }
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(26, 76, 36, 0.2);
+            border-color: #4ade80;
+        }
+        .product-image {
+            height: 250px;
+            background: linear-gradient(45deg, #f0fdf4, #dcfce7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a4c24;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        .product-info { padding: 2.5rem; }
+        .product-info h3 {
+            margin-bottom: 1rem;
+            color: #1a4c24;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            line-height: 1.3;
+        }
+        .product-description {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #16a34a;
+            margin: 1rem 0;
+            font-family: 'Archivo', sans-serif;
+        }
+        .product-status {
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .in_stock {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            border: 1px solid #22c55e;
+        }
+        .out_of_stock {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 1rem 2rem;
+            background: white;
+            color: #1a4c24;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(26, 76, 36, 0.1);
+            border: 2px solid transparent;
+        }
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+            border-color: #16a34a;
+        }
+        .footer {
+            background: linear-gradient(135deg, #1a4c24, #2d7c47);
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+        }
+        .stats-section {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            padding: 4rem 0;
+            margin: 3rem 0;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+        .stat-item {
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(26, 76, 36, 0.1);
+            transition: transform 0.3s;
+        }
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        .stat-item h3 {
+            font-size: 3rem;
+            color: #16a34a;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .stat-item p {
+            color: #1a4c24;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .pet-showcase {
+            background: linear-gradient(135deg, rgba(240, 253, 244, 0.9), rgba(220, 252, 231, 0.9)),
+                        url('/images/pet-showcase.jpg') center/cover;
+            padding: 5rem 0;
+            text-align: center;
+            margin: 3rem 0;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .pet-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(26, 76, 36, 0.1), rgba(45, 124, 71, 0.1));
+            z-index: 1;
+        }
+        .pet-showcase-content {
+            position: relative;
+            z-index: 2;
+        }
+        .pet-showcase h2 {
+            color: #1a4c24;
+            margin-bottom: 2rem;
+        }
+        .pet-showcase p {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="/images/raw-essex-logo.jpg" alt="Raw Essex Logo">
+                Raw Essex
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">All Products</a></li>
+                <li><a href="/faq">FAQ & Education</a></li>
+                <li><a href="/admin">Admin Panel</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Premium Raw Pet Food</h1>
+                <p>Natural, wholesome nutrition for your beloved companions - because they deserve the very best</p>
+                <a href="/products" class="btn">Discover Our Range</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3><%= products.length %></h3>
+                        <p>Premium Products</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>8</h3>
+                        <p>Product Categories</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>100%</h3>
+                        <p>Natural & Raw</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>★★★★★</h3>
+                        <p>Premium Quality</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pet-showcase">
+                <div class="pet-showcase-content">
+                    <h2>Trusted by Pet Lovers Everywhere</h2>
+                    <p>Our premium raw food supports healthy digestion, shiny coats, and boundless energy for dogs, cats, and other beloved pets.</p>
+                    <a href="/products" class="btn">Shop by Pet Type</a>
+                </div>
+            </div>
+
+            <h2>Featured Products</h2>
+
+            <div class="categories">
+                <a href="/products" class="category-btn active">All Products</a>
+                <a href="/products?category=Raw Dog Food" class="category-btn">Raw Dog Food</a>
+                <a href="/products?category=Organ Meats" class="category-btn">Organ Meats</a>
+                <a href="/products?category=Natural Dog Treats" class="category-btn">Natural Dog Treats</a>
+                <a href="/products?category=Dog Supplements" class="category-btn">Dog Supplements</a>
+                <a href="/products?category=Cat Food" class="category-btn">Cat Food</a>
+                <a href="/products?category=Bird Food" class="category-btn">Bird Food</a>
+                <a href="/products?category=Accessories" class="category-btn">Accessories</a>
+            </div>
+
+            <div class="products-grid">
+                <% products.slice(0, 6).forEach(product => { %>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <% if (product.image && product.image.startsWith('http')) { %>
+                                <img src="<%= product.image %>" alt="<%= product.name %>" onerror="this.style.display='none'; this.parentNode.innerHTML='🥩 <%= product.name.substring(0, 25) %>...';">
+                            <% } else { %>
+                                <span>🥩 <%= product.name.substring(0, 25) %>...</span>
+                            <% } %>
+                        </div>
+                        <div class="product-info">
+                            <h3><%= product.name %></h3>
+                            <p class="product-description"><%= product.description %></p>
+                            <div class="product-price">£<%= product.price.toFixed(2) %></div>
+                            <span class="product-status <%= product.status %>">
+                                <%= product.status.replace('_', ' ') %>
+                            </span>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="/products" class="btn">View All <%= products.length %> Products</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Raw Essex. Premium raw pet food and accessories for healthier, happier pets.</p>
+        </div>
+    </footer>
+</body>
+</html>
