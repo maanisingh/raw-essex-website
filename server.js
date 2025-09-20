@@ -7,7 +7,7 @@ const multer = require('multer');
 const fs = require('fs');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
 const { DefaultApi, Configuration } = require('royal-mail-sdk');
-const products = require('./src/data/expanded-products');
+const products = require('./src/data/raw-essex-products');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
