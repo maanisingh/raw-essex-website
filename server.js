@@ -978,10 +978,16 @@ app.get('/admin-panel', (req, res) => {
   res.send(adminHtml);
 });
 
+// Premium Open Source Admin Panel Route
+app.get('/premium-admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'premium-admin.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
-  console.log(`Custom Admin Panel: http://0.0.0.0:${PORT}/admin`);
-  console.log(`OPEN SOURCE ADMIN: http://0.0.0.0:${PORT}/admin-panel`);
+  console.log(`🎉 PREMIUM ADMIN PANEL: http://0.0.0.0:${PORT}/premium-admin`);
+  console.log(`📊 Vue.js + Bootstrap + Chart.js Dashboard`);
+  console.log(`🔧 Features: Products, Orders, Analytics, Real-time Stats`);
   console.log(`FAQ page available at http://0.0.0.0:${PORT}/faq`);
   console.log(`Now featuring ${productList.length} premium products!`);
 });
