@@ -414,6 +414,62 @@ app.post('/api/checkout', async (req, res) => {
   }
 });
 
+// Admin API endpoints
+app.get('/admin/orders', (req, res) => {
+  res.json(orders);
+});
+
+app.get('/admin/accounts', (req, res) => {
+  // Get unique users from shopping carts and orders
+  const accounts = new Map();
+
+  // Add users from shopping carts
+  for (const [userId, cart] of shoppingCarts.entries()) {
+    if (!accounts.has(userId)) {
+      accounts.set(userId, {
+        userId,
+        cartItems: cart.length,
+        totalCartValue: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        lastActivity: new Date(),
+        orders: []
+      });
+    }
+  }
+
+  // Add users from orders
+  orders.forEach(order => {
+    if (!accounts.has(order.userId)) {
+      accounts.set(order.userId, {
+        userId: order.userId,
+        cartItems: 0,
+        totalCartValue: 0,
+        lastActivity: order.createdAt,
+        orders: [order]
+      });
+    } else {
+      accounts.get(order.userId).orders.push(order);
+      accounts.get(order.userId).lastActivity = order.createdAt;
+    }
+  });
+
+  res.json(Array.from(accounts.values()));
+});
+
+app.put('/admin/orders/:orderId/status', (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  const order = orders.find(o => o.id === parseInt(orderId));
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+
+  order.status = status;
+  order.updatedAt = new Date();
+
+  res.json({ success: true, order });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Admin panel available at http://localhost:${PORT}/admin`);
