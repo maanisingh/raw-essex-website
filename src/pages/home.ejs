@@ -338,10 +338,136 @@
         }
 
         .product-price {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #22c55e;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #16a34a;
+            margin: 1rem 0;
+            font-family: 'Archivo', sans-serif;
+        }
+
+        .product-category {
+            color: #16a34a;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-description {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .product-status {
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .in_stock {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            border: 1px solid #22c55e;
+        }
+
+        .out_of_stock {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+
+        .product-actions {
             margin-top: 15px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: #16a34a;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .add-to-cart-btn, .out-of-stock-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .add-to-cart-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .add-to-cart-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .out-of-stock-btn {
+            background: #6b7280;
+            color: white;
+            cursor: not-allowed;
         }
 
         /* Testimonials */
@@ -549,12 +675,40 @@
             </div>
             <div class="products-grid">
                 <% products.slice(0, 6).forEach(product => { %>
-                <div class="product-card">
-                    <div class="product-image">🥩</div>
+                <div class="product-card" onclick="window.location.href='/product/<%= product.id %>'">
+                    <div class="product-image">
+                        <% if (product.image && product.image !== '/images/default.jpg') { %>
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        <% } else { %>
+                            🥩
+                        <% } %>
+                    </div>
                     <div class="product-content">
+                        <div class="product-category"><%= product.category %></div>
                         <h3><%= product.name %></h3>
-                        <p><%= product.description %></p>
+                        <div class="product-description"><%= product.description %></div>
                         <div class="product-price">£<%= product.price.toFixed(2) %></div>
+                        <div class="product-status <%= product.status %>">
+                            <%= product.status === 'in_stock' ? 'In Stock' : 'Out of Stock' %>
+                        </div>
+                        <% if (product.status === 'in_stock') { %>
+                            <div class="product-actions">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('qty-<%= product.id %>', -1)">-</button>
+                                    <input type="number" class="quantity-input" id="qty-<%= product.id %>" value="1" min="1" max="10">
+                                    <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('qty-<%= product.id %>', 1)">+</button>
+                                </div>
+                                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('<%= product.id %>', '<%= product.name.replace(/'/g, '\\\'') %>', <%= product.price %>)">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </div>
+                        <% } else { %>
+                            <div class="product-actions">
+                                <button class="out-of-stock-btn" disabled>
+                                    <i class="fas fa-exclamation-circle"></i> Out of Stock
+                                </button>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
                 <% }); %>
@@ -669,6 +823,100 @@
                     badge.style.display = 'none';
                 }
             }
+        }
+
+        // Quantity controls
+        function changeQuantity(inputId, delta) {
+            const quantityInput = document.getElementById(inputId);
+            let currentValue = parseInt(quantityInput.value);
+            const newValue = currentValue + delta;
+
+            if (newValue >= 1 && newValue <= 10) {
+                quantityInput.value = newValue;
+            }
+        }
+
+        // Add to cart functionality
+        async function addToCart(productId, productName, productPrice) {
+            const userId = getUserId();
+            const quantityInput = document.getElementById(`qty-${productId}`);
+            const quantity = parseInt(quantityInput.value);
+
+            try {
+                const response = await fetch(`/api/cart/${userId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: quantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showCartNotification(productName, quantity, result.cartCount);
+                    updateCartBadge(result.cartCount);
+                    quantityInput.value = 1; // Reset quantity
+                } else {
+                    alert('Failed to add product to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding product to cart');
+            }
+        }
+
+        // Show cart notification
+        function showCartNotification(productName, quantity, cartCount) {
+            // Remove existing notification if any
+            const existingNotification = document.querySelector('.cart-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: white;
+                border: 1px solid #22c55e;
+                border-radius: 15px;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: all 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-check-circle" style="color: #22c55e; font-size: 1.2rem;"></i>
+                    <span>${quantity}x ${productName} added to cart!</span>
+                    <a href="/cart" style="background: #22c55e; color: white; padding: 5px 15px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; margin-left: 10px;">View Cart (${cartCount})</a>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Hide notification after 4 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 4000);
         }
 
         async function loadCartCount() {

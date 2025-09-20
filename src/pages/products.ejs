@@ -130,6 +130,50 @@
             margin-top: 15px;
         }
 
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: #16a34a;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
         .add-to-cart-btn, .out-of-stock-btn {
             width: 100%;
             padding: 12px 20px;
@@ -432,6 +476,11 @@
                             <div class="product-price">£<%= product.price.toFixed(2) %></div>
                             <div class="product-actions">
                                 <% if (product.status === 'in_stock') { %>
+                                    <div class="quantity-controls">
+                                        <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('qty-<%= product.id %>', -1)">-</button>
+                                        <input type="number" class="quantity-input" id="qty-<%= product.id %>" value="1" min="1" max="10">
+                                        <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('qty-<%= product.id %>', 1)">+</button>
+                                    </div>
                                     <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('<%= product.id %>', '<%= product.name.replace(/'/g, '\\\'') %>', <%= product.price %>)">
                                         <i class="fas fa-shopping-cart"></i> Add to Cart
                                     </button>
@@ -488,9 +537,22 @@
             return userId;
         }
 
+        // Quantity controls
+        function changeQuantity(inputId, delta) {
+            const quantityInput = document.getElementById(inputId);
+            let currentValue = parseInt(quantityInput.value);
+            const newValue = currentValue + delta;
+
+            if (newValue >= 1 && newValue <= 10) {
+                quantityInput.value = newValue;
+            }
+        }
+
         // Add to cart functionality
         async function addToCart(productId, productName, price) {
             const userId = getUserId();
+            const quantityInput = document.getElementById(`qty-${productId}`);
+            const quantity = parseInt(quantityInput.value);
 
             try {
                 const response = await fetch(`/api/cart/${userId}/add`, {
@@ -500,15 +562,16 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
-                        quantity: 1
+                        quantity: quantity
                     })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    showCartNotification(productName, result.cartCount);
+                    showCartNotification(productName, quantity, result.cartCount);
                     updateCartBadge(result.cartCount);
+                    quantityInput.value = 1; // Reset quantity
                 } else {
                     alert('Failed to add product to cart');
                 }
@@ -519,7 +582,7 @@
         }
 
         // Show cart notification
-        function showCartNotification(productName, cartCount) {
+        function showCartNotification(productName, quantity, cartCount) {
             // Remove existing notification if any
             const existingNotification = document.querySelector('.cart-notification');
             if (existingNotification) {
@@ -532,7 +595,7 @@
             notification.innerHTML = `
                 <div class="notification-content">
                     <i class="fas fa-check-circle"></i>
-                    <span>${productName} added to cart!</span>
+                    <span>${quantity}x ${productName} added to cart!</span>
                     <a href="/cart">View Cart (${cartCount})</a>
                 </div>
             `;
