@@ -875,7 +875,10 @@
             });
 
             // Show selected tab
-            document.getElementById(tabName + '-tab').classList.add('active');
+            const targetTab = document.getElementById(tabName + '-tab');
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
 
             // Activate button
             if (element) {
