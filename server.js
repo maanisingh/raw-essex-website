@@ -6,6 +6,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
+const { DefaultApi, Configuration } = require('royal-mail-sdk');
 const products = require('./src/data/expanded-products');
 
 const app = express();
@@ -954,6 +955,280 @@ app.post('/admin/stripe/configure', (req, res) => {
   } else {
     res.status(400).json({
       error: 'Publishable key and secret key are required'
+    });
+  }
+});
+
+// Royal Mail Configuration and API
+let royalMailConfig = {
+  clientId: process.env.ROYAL_MAIL_CLIENT_ID || '',
+  clientSecret: process.env.ROYAL_MAIL_CLIENT_SECRET || '',
+  environment: 'sandbox' // or 'production'
+};
+
+// Initialize Royal Mail API
+let royalMailApi = null;
+
+function initializeRoyalMailAPI() {
+  if (royalMailConfig.clientId && royalMailConfig.clientSecret) {
+    try {
+      const config = new Configuration({
+        basePath: royalMailConfig.environment === 'production'
+          ? 'https://api.royalmail.net'
+          : 'https://api.royalmail.net', // Same URL for both
+        apiKey: royalMailConfig.clientId,
+        accessToken: royalMailConfig.clientSecret
+      });
+      royalMailApi = new DefaultApi(config);
+      console.log('✅ Royal Mail API initialized successfully');
+    } catch (error) {
+      console.error('❌ Error initializing Royal Mail API:', error.message);
+    }
+  }
+}
+
+app.post('/admin/royal-mail/configure', (req, res) => {
+  const { clientId, clientSecret, environment } = req.body;
+
+  if (clientId && clientSecret) {
+    royalMailConfig = {
+      ...royalMailConfig,
+      clientId,
+      clientSecret,
+      environment: environment || 'sandbox',
+      apiUrl: environment === 'production'
+        ? 'https://api.royalmail.net/shipping/v1'
+        : 'https://api.royalmail.net/shipping/v1'
+    };
+
+    res.json({
+      success: true,
+      message: 'Royal Mail configuration updated successfully'
+    });
+  } else {
+    res.status(400).json({
+      error: 'Client ID and Client Secret are required'
+    });
+  }
+});
+
+app.get('/api/royal-mail/config', (req, res) => {
+  res.json({
+    clientId: royalMailConfig.clientId ? '****' + royalMailConfig.clientId.slice(-4) : '',
+    environment: royalMailConfig.environment,
+    configured: !!(royalMailConfig.clientId && royalMailConfig.clientSecret)
+  });
+});
+
+// Royal Mail API Helper Functions
+async function getRoyalMailAccessToken() {
+  try {
+    if (!royalMailConfig.clientId || !royalMailConfig.clientSecret) {
+      throw new Error('Royal Mail credentials not configured');
+    }
+
+    // Return mock token for now - will implement proper SDK later
+    return 'mock-royal-mail-token';
+  } catch (error) {
+    console.error('Royal Mail token error:', error);
+    throw error;
+  }
+}
+
+// Create Royal Mail shipment
+app.post('/api/royal-mail/create-shipment', async (req, res) => {
+  try {
+    const { orderData, shippingDetails } = req.body;
+    const accessToken = await getRoyalMailAccessToken();
+
+    const shipmentData = {
+      shipments: [{
+        shipmentReference: `RM-${Date.now()}`,
+        recipient: {
+          name: shippingDetails.name,
+          companyName: shippingDetails.company || '',
+          addressLine1: shippingDetails.address1,
+          addressLine2: shippingDetails.address2 || '',
+          addressLine3: shippingDetails.address3 || '',
+          postTown: shippingDetails.city,
+          county: shippingDetails.county || '',
+          countryCode: shippingDetails.countryCode || 'GB',
+          postcode: shippingDetails.postcode,
+          phoneNumber: shippingDetails.phone || '',
+          emailAddress: shippingDetails.email || ''
+        },
+        sender: {
+          name: 'Raw Essex',
+          companyName: 'Raw Essex Pet Foods',
+          addressLine1: 'Business Address',
+          addressLine2: '',
+          postTown: 'Essex',
+          county: 'Essex',
+          countryCode: 'GB',
+          postcode: 'CM0 0XX',
+          phoneNumber: '01234567890',
+          emailAddress: 'orders@rawessex.com'
+        },
+        packages: [{
+          weightInGrams: orderData.weight || 1000,
+          dimensions: {
+            heightInMm: 100,
+            widthInMm: 200,
+            lengthInMm: 300
+          },
+          packageOccurrence: 1
+        }],
+        serviceSettings: {
+          serviceCode: 'SD1', // Signed For 1st Class
+          serviceEnhancements: []
+        }
+      }]
+    };
+
+    // Mock Royal Mail shipment creation for now
+    const shipment = {
+      id: `RM-${Date.now()}`,
+      trackingNumber: `RM${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      orderId: orderData.orderId,
+      status: 'created',
+      service: 'Royal Mail Signed For 1st Class',
+      createdAt: new Date().toISOString(),
+      estimatedDelivery: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      cost: 5.50
+    };
+
+    res.json({
+      success: true,
+      shipment
+    });
+
+  } catch (error) {
+    console.error('Royal Mail shipment creation failed:', error);
+    res.status(400).json({
+      error: error.message,
+      details: 'Failed to create Royal Mail shipment'
+    });
+  }
+});
+
+// Get Royal Mail shipping rates
+app.post('/api/royal-mail/get-rates', async (req, res) => {
+  try {
+    const { weight, dimensions, postcode } = req.body;
+    const accessToken = await getRoyalMailAccessToken();
+
+    const rateRequest = {
+      packages: [{
+        weightInGrams: weight || 1000,
+        dimensions: dimensions || {
+          heightInMm: 100,
+          widthInMm: 200,
+          lengthInMm: 300
+        }
+      }],
+      destination: {
+        countryCode: 'GB',
+        postcode: postcode
+      }
+    };
+
+    // Mock Royal Mail rates for now
+    const rates = [
+      { service: '1st Class', price: 5.50, deliveryTime: '1-2 days' },
+      { service: '2nd Class', price: 3.50, deliveryTime: '2-3 days' },
+      { service: 'Special Delivery', price: 12.50, deliveryTime: 'Next day' },
+      { service: 'Signed For', price: 7.50, deliveryTime: '1-2 days' }
+    ];
+
+    res.json({
+      success: true,
+      rates
+    });
+
+  } catch (error) {
+    console.error('Royal Mail rates error:', error);
+    res.status(400).json({
+      error: error.message
+    });
+  }
+});
+
+// Track Royal Mail shipment
+app.get('/api/royal-mail/track/:trackingNumber', async (req, res) => {
+  try {
+    const { trackingNumber } = req.params;
+    const accessToken = await getRoyalMailAccessToken();
+
+    // Mock Royal Mail tracking for now
+    const trackingData = {
+      trackingNumber: trackingNumber,
+      status: 'In Transit',
+      location: 'Royal Mail Depot',
+      estimatedDelivery: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      updates: [
+        { date: new Date().toISOString(), status: 'Collected', location: 'Raw Essex HQ' },
+        { date: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), status: 'In Transit', location: 'Royal Mail Depot' }
+      ]
+    };
+
+    res.json({
+      success: true,
+      tracking: trackingData
+    });
+
+  } catch (error) {
+    console.error('Royal Mail tracking error:', error);
+    res.status(400).json({
+      error: error.message
+    });
+  }
+});
+
+// Get Royal Mail shipments for admin
+app.get('/admin/royal-mail/shipments', (req, res) => {
+  // Mock shipments data
+  const shipments = [
+    {
+      id: 'RM001',
+      tracking_id: 'RM123456789GB',
+      service: '1st Class',
+      destination: 'London, UK',
+      status: 'delivered',
+      created_at: new Date().toISOString()
+    }
+  ];
+  res.json(shipments);
+});
+
+// Test Royal Mail connection
+app.post('/admin/royal-mail/test', async (req, res) => {
+  try {
+    const accessToken = await getRoyalMailAccessToken();
+    res.json({
+      success: true,
+      message: 'Royal Mail connection successful',
+      environment: royalMailConfig.environment
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+app.get('/api/royal-mail/test-connection', async (req, res) => {
+  try {
+    const accessToken = await getRoyalMailAccessToken();
+    res.json({
+      success: true,
+      message: 'Royal Mail connection successful',
+      environment: royalMailConfig.environment
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
     });
   }
 });

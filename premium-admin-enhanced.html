@@ -147,6 +147,70 @@
             background: #d1fae5;
             border-color: #059669;
         }
+
+        /* Product Form Styling Improvements */
+        .product-form .form-label {
+            color: #1f2937;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-form .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            color: #1f2937;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .product-form .form-control:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+            outline: none;
+        }
+
+        .product-form textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .product-form .text-muted {
+            color: #6b7280 !important;
+            font-size: 14px;
+        }
+
+        .product-form h4 {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .product-form .btn-close {
+            background-color: #f3f4f6;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .product-form .btn-close:hover {
+            background-color: #e5e7eb;
+            opacity: 1;
+        }
+
+        /* Modal overlay improvements */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Form validation styling */
+        .product-form .form-control:invalid {
+            border-color: #ef4444;
+        }
+
+        .product-form .form-control:valid {
+            border-color: #22c55e;
+        }
     </style>
 </head>
 <body>
@@ -182,6 +246,9 @@
                     </a>
                     <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'stripe' }" @click="setActiveTab('stripe')">
                         <i class="fas fa-credit-card me-2"></i> Stripe Config
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'royal-mail' }" @click="setActiveTab('royal-mail')">
+                        <i class="fas fa-truck me-2"></i> Royal Mail
                     </a>
                 </nav>
 
@@ -259,6 +326,40 @@
                             </button>
                         </div>
 
+                        <!-- Product Search and Filters -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" placeholder="Search products..." v-model="productSearch">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" v-model="categoryFilter">
+                                    <option value="">All Categories</option>
+                                    <option value="Raw Dog Food">Raw Dog Food</option>
+                                    <option value="Organ Meats">Organ Meats</option>
+                                    <option value="Natural Dog Treats">Natural Dog Treats</option>
+                                    <option value="Dog Supplements">Dog Supplements</option>
+                                    <option value="Cat Food">Cat Food</option>
+                                    <option value="Bird Food">Bird Food</option>
+                                    <option value="Accessories">Accessories</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" v-model="stockFilter">
+                                    <option value="">All Stock Status</option>
+                                    <option value="in_stock">In Stock</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-secondary w-100" @click="clearFilters">
+                                    <i class="fas fa-times me-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="data-table p-4">
                             <div v-if="loading" class="text-center">
                                 <div class="loading-spinner"></div>
@@ -279,7 +380,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="product in products" :key="product.id">
+                                            <tr v-for="product in filteredProducts" :key="product.id">
                                                 <td>
                                                     <img :src="product.image || '/images/no-image.jpg'"
                                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
@@ -486,6 +587,153 @@
                         </div>
                     </div>
 
+                    <!-- Royal Mail Configuration -->
+                    <div v-else-if="activeTab === 'royal-mail'" key="royal-mail">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Royal Mail Integration</h2>
+                            <button class="btn btn-premium" @click="testRoyalMailConnection">
+                                <i class="fas fa-plug me-2"></i>Test Connection
+                            </button>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">API Configuration</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Client ID *</label>
+                                        <input type="text" class="form-control" v-model="royalMailConfig.clientId"
+                                               placeholder="Enter Royal Mail Client ID">
+                                        <small class="text-muted">Your Royal Mail API Client ID</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Client Secret *</label>
+                                        <input type="password" class="form-control" v-model="royalMailConfig.clientSecret"
+                                               placeholder="Enter Royal Mail Client Secret">
+                                        <small class="text-muted">Your Royal Mail API Client Secret</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Environment</label>
+                                        <select class="form-control" v-model="royalMailConfig.environment">
+                                            <option value="sandbox">Sandbox (Testing)</option>
+                                            <option value="production">Production (Live)</option>
+                                        </select>
+                                        <small class="text-muted">Use sandbox for testing, production for live orders</small>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-premium" @click="saveRoyalMailConfig" :disabled="!royalMailConfig.clientId || !royalMailConfig.clientSecret">
+                                            <i class="fas fa-save me-2"></i>Save Configuration
+                                        </button>
+                                        <button class="btn btn-outline-primary" @click="testRoyalMailConnection">
+                                            <i class="fas fa-check-circle me-2"></i>Test Connection
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">Shipping Services</h5>
+
+                                    <div class="mb-3">
+                                        <h6 class="fw-semibold">Available Services</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="royalMailServices.firstClass" id="firstClass">
+                                            <label class="form-check-label" for="firstClass">1st Class</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="royalMailServices.secondClass" id="secondClass">
+                                            <label class="form-check-label" for="secondClass">2nd Class</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="royalMailServices.specialDelivery" id="specialDelivery">
+                                            <label class="form-check-label" for="specialDelivery">Special Delivery Guaranteed</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="royalMailServices.signedFor" id="signedFor">
+                                            <label class="form-check-label" for="signedFor">Signed For</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Connection Status</h6>
+                                        <div class="d-flex align-items-center">
+                                            <span v-if="royalMailStatus === 'connected'" class="badge bg-success me-2">
+                                                <i class="fas fa-check-circle me-1"></i>Connected
+                                            </span>
+                                            <span v-else-if="royalMailStatus === 'testing'" class="badge bg-warning me-2">
+                                                <i class="fas fa-spinner fa-spin me-1"></i>Testing...
+                                            </span>
+                                            <span v-else class="badge bg-secondary me-2">
+                                                <i class="fas fa-times-circle me-1"></i>Not Connected
+                                            </span>
+                                            <small class="text-muted">{{ royalMailMessage }}</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <small>
+                                            <strong>Setup Instructions:</strong><br>
+                                            1. Register at Royal Mail Developer Portal<br>
+                                            2. Create an application and get API credentials<br>
+                                            3. Add your Client ID and Secret above<br>
+                                            4. Test the connection<br>
+                                            5. Configure webhook endpoints if needed
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">Recent Shipments</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Tracking ID</th>
+                                                    <th>Service</th>
+                                                    <th>Destination</th>
+                                                    <th>Status</th>
+                                                    <th>Created</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="shipment in royalMailShipments" :key="shipment.id">
+                                                    <td><code>{{ shipment.tracking_id }}</code></td>
+                                                    <td>{{ shipment.service }}</td>
+                                                    <td>{{ shipment.destination }}</td>
+                                                    <td>
+                                                        <span class="badge bg-info" v-if="shipment.status === 'created'">Created</span>
+                                                        <span class="badge bg-warning" v-else-if="shipment.status === 'in_transit'">In Transit</span>
+                                                        <span class="badge bg-success" v-else-if="shipment.status === 'delivered'">Delivered</span>
+                                                        <span class="badge bg-danger" v-else>{{ shipment.status }}</span>
+                                                    </td>
+                                                    <td>{{ formatDate(shipment.created_at) }}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary" @click="trackShipment(shipment.tracking_id)">
+                                                            <i class="fas fa-search"></i> Track
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr v-if="royalMailShipments.length === 0">
+                                                    <td colspan="6" class="text-center text-muted">No shipments yet</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Other tabs placeholder -->
                     <div v-else class="text-center py-5">
                         <i class="fas fa-cogs fs-1 text-muted mb-3"></i>
@@ -551,24 +799,27 @@
                                  @drop="handleFileDrop"
                                  @dragover.prevent
                                  @dragenter.prevent
-                                 @click="$refs.fileInput.click()">
+                                 @click="$refs.fileInput.click()"
+                                 style="cursor: pointer;">
                                 <div v-if="productForm.image">
                                     <img :src="productForm.image" class="image-preview mb-3">
-                                    <p>Click to change image or drag new file here</p>
+                                    <p style="color: #374151; font-weight: 500;">Click to change image or drag new file here</p>
                                 </div>
                                 <div v-else>
-                                    <i class="fas fa-cloud-upload-alt fs-1 text-muted mb-3"></i>
-                                    <p>Click to upload image or drag file here</p>
-                                    <small class="text-muted">Supports JPG, PNG, GIF</small>
+                                    <i class="fas fa-cloud-upload-alt fs-1 mb-3" style="color: #22c55e;"></i>
+                                    <p style="color: #374151; font-weight: 500; margin-bottom: 8px;">Click to upload image or drag file here</p>
+                                    <small style="color: #6b7280;">Supports JPG, PNG, GIF (Max 5MB)</small>
                                 </div>
                             </div>
                             <input type="file" ref="fileInput" @change="handleFileSelect" accept="image/*" style="display: none;">
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-secondary" @click="closeProductForm">Cancel</button>
-                        <button type="submit" class="btn btn-premium" :disabled="saving">
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <button type="button" class="btn btn-outline-secondary px-4 py-2" @click="closeProductForm" style="font-weight: 500;">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-premium px-4 py-2" :disabled="saving" style="font-weight: 600;">
                             <i class="fas fa-save me-2"></i>{{ saving ? 'Saving...' : 'Save Product' }}
                         </button>
                     </div>
@@ -615,7 +866,54 @@
                     },
                     stripePayments: [],
                     savingStripe: false,
-                    baseUrl: window.location.origin
+                    baseUrl: window.location.origin,
+                    // Product search and filters
+                    productSearch: '',
+                    categoryFilter: '',
+                    stockFilter: '',
+                    // Royal Mail integration
+                    royalMailConfig: {
+                        clientId: '',
+                        clientSecret: '',
+                        environment: 'sandbox'
+                    },
+                    royalMailServices: {
+                        firstClass: true,
+                        secondClass: true,
+                        specialDelivery: false,
+                        signedFor: false
+                    },
+                    royalMailStatus: 'not_connected',
+                    royalMailMessage: 'Please configure your Royal Mail API credentials',
+                    royalMailShipments: []
+                }
+            },
+            computed: {
+                filteredProducts() {
+                    let filtered = this.products;
+
+                    // Search filter
+                    if (this.productSearch) {
+                        const search = this.productSearch.toLowerCase();
+                        filtered = filtered.filter(product =>
+                            product.name.toLowerCase().includes(search) ||
+                            product.category.toLowerCase().includes(search) ||
+                            product.brand.toLowerCase().includes(search) ||
+                            (product.description && product.description.toLowerCase().includes(search))
+                        );
+                    }
+
+                    // Category filter
+                    if (this.categoryFilter) {
+                        filtered = filtered.filter(product => product.category === this.categoryFilter);
+                    }
+
+                    // Stock filter
+                    if (this.stockFilter) {
+                        filtered = filtered.filter(product => product.status === this.stockFilter);
+                    }
+
+                    return filtered;
                 }
             },
             mounted() {
@@ -630,6 +928,14 @@
                     if (tab === 'customers') this.loadCustomers();
                     if (tab === 'payments') this.loadPayments();
                     if (tab === 'stripe') this.loadStripePayments();
+                    if (tab === 'royal-mail') this.loadRoyalMailData();
+                },
+
+                // Product filter methods
+                clearFilters() {
+                    this.productSearch = '';
+                    this.categoryFilter = '';
+                    this.stockFilter = '';
                 },
 
                 async loadDashboardData() {
@@ -840,6 +1146,51 @@
                         this.stripePayments = response.data.filter(payment => payment.method === 'stripe');
                     } catch (error) {
                         console.error('Error loading Stripe payments:', error);
+                    }
+                },
+
+                // Royal Mail methods
+                async loadRoyalMailData() {
+                    try {
+                        const response = await axios.get('/admin/royal-mail/shipments');
+                        this.royalMailShipments = response.data;
+                    } catch (error) {
+                        console.error('Error loading Royal Mail data:', error);
+                    }
+                },
+
+                async saveRoyalMailConfig() {
+                    try {
+                        await axios.post('/admin/royal-mail/configure', this.royalMailConfig);
+                        this.royalMailMessage = 'Configuration saved successfully';
+                        alert('Royal Mail configuration saved successfully!');
+                    } catch (error) {
+                        this.royalMailMessage = 'Error saving configuration';
+                        alert('Error saving Royal Mail configuration: ' + error.response?.data?.error || error.message);
+                    }
+                },
+
+                async testRoyalMailConnection() {
+                    this.royalMailStatus = 'testing';
+                    this.royalMailMessage = 'Testing connection...';
+                    try {
+                        const response = await axios.post('/admin/royal-mail/test', this.royalMailConfig);
+                        this.royalMailStatus = 'connected';
+                        this.royalMailMessage = 'Connection successful!';
+                        alert('Royal Mail connection successful!');
+                    } catch (error) {
+                        this.royalMailStatus = 'not_connected';
+                        this.royalMailMessage = 'Connection failed: ' + (error.response?.data?.error || error.message);
+                        alert('Royal Mail connection failed: ' + (error.response?.data?.error || error.message));
+                    }
+                },
+
+                async trackShipment(trackingId) {
+                    try {
+                        const response = await axios.get(`/admin/royal-mail/track/${trackingId}`);
+                        alert(`Tracking Status: ${response.data.status}\nLocation: ${response.data.location}`);
+                    } catch (error) {
+                        alert('Error tracking shipment: ' + (error.response?.data?.error || error.message));
                     }
                 },
 
