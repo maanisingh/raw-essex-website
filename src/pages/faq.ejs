@@ -142,6 +142,92 @@
             width: 100%;
             height: 100%;
         }
+
+        .education-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
+            margin-bottom: 4rem;
+        }
+        .education-section h2 {
+            color: #1a4c24;
+            margin-bottom: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        .education-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+        .featured-video {
+            background: #f8fdf9;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .featured-video h3 {
+            color: #1a4c24;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        .video-placeholder {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 10px;
+            padding: 3rem 2rem;
+            border: 2px dashed #22c55e;
+        }
+        .video-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #22c55e;
+        }
+        .video-placeholder p {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a4c24;
+            margin-bottom: 0.5rem;
+        }
+        .video-placeholder small {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .education-text h3 {
+            color: #1a4c24;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .education-text h3:first-child {
+            margin-top: 0;
+        }
+        .benefits-list, .diet-composition, .safety-list {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+        .benefits-list li, .diet-composition li, .safety-list li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+        .education-text p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .education-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
         .search-box {
             background: white;
             padding: 2rem;
@@ -291,41 +377,52 @@
             <p>Get answers to the most common questions about raw feeding for pets</p>
         </div>
 
-        <div class="video-section">
-            <h2>Expert Veterinary Guidance</h2>
-            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 2rem;">Watch these expert veterinarians explain the benefits of raw feeding</p>
+        <div class="education-section">
+            <h2>Raw Feeding Education</h2>
+            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 3rem;">Learn about the benefits and science behind raw feeding for optimal pet health</p>
 
-            <div class="video-grid">
-                <div class="video-card">
-                    <h3>🩺 Raw Feeding Benefits - Dr. Ian Billinghurst</h3>
-                    <div class="video-embed">
-                        <iframe src="https://www.youtube.com/embed/HK4wOt1_Hek" frameborder="0" allowfullscreen width="100%" height="200"></iframe>
+            <div class="education-content">
+                <div class="featured-video">
+                    <h3>🩺 Understanding Raw Feeding Benefits</h3>
+                    <div class="video-placeholder">
+                        <div class="video-icon">🎥</div>
+                        <p>Educational Video Coming Soon</p>
+                        <small>We're preparing high-quality educational content from leading veterinary experts</small>
                     </div>
-                    <p style="color: #4b5563; font-size: 0.9rem;">The pioneer of raw feeding explains the science and benefits</p>
                 </div>
 
-                <div class="video-card">
-                    <h3>🥩 Complete Raw Feeding Guide</h3>
-                    <div class="video-embed">
-                        <iframe src="https://www.youtube.com/embed/qQT-LhT0VoY" frameborder="0" allowfullscreen width="100%" height="200"></iframe>
-                    </div>
-                    <p style="color: #4b5563; font-size: 0.9rem;">Comprehensive guide to raw feeding for dogs and cats</p>
-                </div>
+                <div class="education-text">
+                    <h3>Key Benefits of Raw Feeding</h3>
+                    <ul class="benefits-list">
+                        <li><strong>Improved Digestion:</strong> Raw food is easier for dogs to digest, often resulting in smaller, firmer stools</li>
+                        <li><strong>Healthier Coat & Skin:</strong> Natural fats and oils in raw meat lead to shinier coats and less skin irritation</li>
+                        <li><strong>Better Dental Health:</strong> Raw bones help clean teeth naturally and strengthen jaw muscles</li>
+                        <li><strong>Weight Management:</strong> Higher protein, lower carbohydrate content helps maintain healthy weight</li>
+                        <li><strong>Increased Energy:</strong> Many pet owners report higher energy levels and improved vitality</li>
+                        <li><strong>Stronger Immune System:</strong> Natural nutrients support overall immune function</li>
+                    </ul>
 
-                <div class="video-card">
-                    <h3>🐕 Raw Diet Transformation Stories</h3>
-                    <div class="video-embed">
-                        <iframe src="https://www.youtube.com/embed/4dFJpKr3W8M" frameborder="0" allowfullscreen width="100%" height="200"></iframe>
-                    </div>
-                    <p style="color: #4b5563; font-size: 0.9rem;">Real pet owners share their raw feeding success stories</p>
-                </div>
+                    <h3>The BARF Diet Approach</h3>
+                    <p>BARF (Biologically Appropriate Raw Food) was developed by veterinarian Dr. Ian Billinghurst. The recommended composition is:</p>
+                    <ul class="diet-composition">
+                        <li>70% Muscle meat</li>
+                        <li>10% Raw edible bones</li>
+                        <li>7% Vegetables</li>
+                        <li>5% Liver</li>
+                        <li>5% Other organs</li>
+                        <li>2% Seeds or nuts</li>
+                        <li>1% Fruit</li>
+                    </ul>
 
-                <div class="video-card">
-                    <h3>🦴 Raw Feeding Safety & Preparation</h3>
-                    <div class="video-embed">
-                        <iframe src="https://www.youtube.com/embed/y_K-k9XWjNY" frameborder="0" allowfullscreen width="100%" height="200"></iframe>
-                    </div>
-                    <p style="color: #4b5563; font-size: 0.9rem;">Expert tips on safe handling and preparation of raw food</p>
+                    <h3>Safety Guidelines</h3>
+                    <p><strong>Always consult your veterinarian</strong> before switching to a raw diet. Important safety measures include:</p>
+                    <ul class="safety-list">
+                        <li>Keep raw food frozen until ready to use</li>
+                        <li>Thaw in refrigerator, never at room temperature</li>
+                        <li>Wash hands thoroughly after handling raw food</li>
+                        <li>Clean all surfaces and bowls with hot soapy water</li>
+                        <li>Source from reputable suppliers like Raw Essex</li>
+                    </ul>
                 </div>
             </div>
         </div>
