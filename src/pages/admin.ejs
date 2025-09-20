@@ -517,13 +517,13 @@
 
         <div class="tab-navigation">
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="showTab('products')">
+                <button class="tab-btn active" onclick="showTab('products', this)">
                     <i class="fas fa-box"></i> Products
                 </button>
-                <button class="tab-btn" onclick="showTab('orders')">
+                <button class="tab-btn" onclick="showTab('orders', this)">
                     <i class="fas fa-shopping-cart"></i> Orders
                 </button>
-                <button class="tab-btn" onclick="showTab('accounts')">
+                <button class="tab-btn" onclick="showTab('accounts', this)">
                     <i class="fas fa-users"></i> Accounts
                 </button>
             </div>
@@ -720,7 +720,7 @@
 
     <script>
         // Tab Management
-        function showTab(tabName) {
+        function showTab(tabName, element) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -735,7 +735,9 @@
             document.getElementById(tabName + '-tab').classList.add('active');
 
             // Activate button
-            event.target.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
 
             // Load data for the tab
             if (tabName === 'orders') {

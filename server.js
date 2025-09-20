@@ -23,6 +23,29 @@ let productList = [...products];
 // In-memory storage for demo (replace with database in production)
 let shoppingCarts = new Map(); // userId -> cart items
 let orders = [];
+let users = new Map(); // Store user accounts: email/phone -> user data
+let userSessions = new Map(); // Store active sessions: sessionId -> userId
+let payments = new Map(); // Store payment records: paymentId -> payment data
+let paymentSettings = {
+  bankTransfer: {
+    enabled: true,
+    bankName: 'Your Bank Name',
+    accountName: 'Raw Essex Ltd',
+    sortCode: '12-34-56',
+    accountNumber: '12345678',
+    reference: 'RAWESSEX-{orderId}'
+  },
+  openBanking: {
+    enabled: false,
+    clientId: '',
+    redirectUrl: ''
+  },
+  paypal: {
+    enabled: false,
+    clientId: '',
+    secretKey: ''
+  }
+};
 let shippingSettings = {
   dpd: { enabled: false, apiKey: '', pricePerKg: 5.99, freeShippingThreshold: 50 },
   dhl: { enabled: false, apiKey: '', pricePerKg: 7.99, freeShippingThreshold: 75 },
@@ -155,6 +178,11 @@ app.get('/admin/test-settings', (req, res) => {
     }
   };
   res.json(results);
+});
+
+// Authentication routes
+app.get('/auth', (req, res) => {
+  res.render('auth');
 });
 
 // Admin panel routes
@@ -383,9 +411,114 @@ app.post('/api/cart/:userId/update', (req, res) => {
   res.json({ success: true });
 });
 
+// Payment endpoints
+app.get('/api/payment/methods', (req, res) => {
+  const availableMethods = [];
+
+  if (paymentSettings.bankTransfer.enabled) {
+    availableMethods.push({
+      id: 'bank_transfer',
+      name: 'Bank Transfer',
+      description: 'Transfer directly to our bank account',
+      icon: 'fas fa-university',
+      processingTime: 'Instant verification with payment reference'
+    });
+  }
+
+  if (paymentSettings.openBanking.enabled) {
+    availableMethods.push({
+      id: 'open_banking',
+      name: 'Open Banking',
+      description: 'Secure bank-to-bank transfer',
+      icon: 'fas fa-shield-alt',
+      processingTime: 'Instant payment'
+    });
+  }
+
+  if (paymentSettings.paypal.enabled) {
+    availableMethods.push({
+      id: 'paypal',
+      name: 'PayPal',
+      description: 'Pay with PayPal or card',
+      icon: 'fab fa-paypal',
+      processingTime: 'Instant payment'
+    });
+  }
+
+  res.json(availableMethods);
+});
+
+app.post('/api/payment/initiate', async (req, res) => {
+  const { userId, paymentMethod, orderId } = req.body;
+
+  const order = orders.find(o => o.id === parseInt(orderId));
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+
+  const paymentId = 'pay_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+  if (paymentMethod === 'bank_transfer') {
+    const payment = {
+      id: paymentId,
+      orderId: order.id,
+      userId,
+      method: 'bank_transfer',
+      amount: order.total,
+      status: 'pending',
+      reference: paymentSettings.bankTransfer.reference.replace('{orderId}', order.id),
+      bankDetails: {
+        bankName: paymentSettings.bankTransfer.bankName,
+        accountName: paymentSettings.bankTransfer.accountName,
+        sortCode: paymentSettings.bankTransfer.sortCode,
+        accountNumber: paymentSettings.bankTransfer.accountNumber
+      },
+      createdAt: new Date()
+    };
+
+    payments.set(paymentId, payment);
+
+    res.json({
+      success: true,
+      paymentId,
+      instructions: {
+        method: 'bank_transfer',
+        bankDetails: payment.bankDetails,
+        reference: payment.reference,
+        amount: payment.amount,
+        message: 'Please transfer the exact amount using the reference number provided'
+      }
+    });
+  } else {
+    res.status(400).json({ error: 'Payment method not supported yet' });
+  }
+});
+
+app.post('/api/payment/confirm', async (req, res) => {
+  const { paymentId, transactionReference } = req.body;
+
+  const payment = payments.get(paymentId);
+  if (!payment) {
+    return res.status(404).json({ error: 'Payment not found' });
+  }
+
+  payment.status = 'confirmed';
+  payment.transactionReference = transactionReference;
+  payment.confirmedAt = new Date();
+
+  // Update order status
+  const order = orders.find(o => o.id === payment.orderId);
+  if (order) {
+    order.status = 'paid';
+    order.paymentId = paymentId;
+  }
+
+  res.json({ success: true, message: 'Payment confirmed' });
+});
+
 // Checkout and Payment
 app.post('/api/checkout', async (req, res) => {
-  const { userId, paymentMethodId, shippingAddress } = req.body;
+  const { userId, paymentMethod, shippingAddress } = req.body;
   const cart = shoppingCarts.get(userId) || [];
 
   if (cart.length === 0) {
@@ -393,25 +526,200 @@ app.post('/api/checkout', async (req, res) => {
   }
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = total >= 30 ? 0 : 3.99;
+  const finalTotal = total + shipping;
 
   try {
     const order = {
       id: Date.now(),
       userId,
       items: cart,
-      total,
+      subtotal: total,
+      shipping: shipping,
+      total: finalTotal,
       shippingAddress,
-      status: 'confirmed',
+      status: 'pending_payment',
+      paymentMethod,
       createdAt: new Date()
     };
 
     orders.push(order);
     shoppingCarts.delete(userId);
 
-    res.json({ success: true, orderId: order.id });
+    res.json({
+      success: true,
+      orderId: order.id,
+      total: finalTotal,
+      nextStep: 'payment'
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Payment processing failed' });
+    res.status(500).json({ error: 'Order creation failed' });
   }
+});
+
+// User Authentication endpoints
+app.post('/api/auth/register', (req, res) => {
+  const { email, phone, name, password } = req.body;
+
+  // Validate input
+  if (!email && !phone) {
+    return res.status(400).json({ error: 'Email or phone number is required' });
+  }
+  if (!name || !password) {
+    return res.status(400).json({ error: 'Name and password are required' });
+  }
+
+  const identifier = email || phone;
+
+  // Check if user already exists
+  if (users.has(identifier)) {
+    return res.status(409).json({ error: 'User already exists' });
+  }
+
+  // Create new user
+  const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  const user = {
+    id: userId,
+    email: email || null,
+    phone: phone || null,
+    name,
+    password, // In production, hash this password
+    createdAt: new Date(),
+    isActive: true
+  };
+
+  users.set(identifier, user);
+
+  // Create session
+  const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  userSessions.set(sessionId, userId);
+
+  res.json({
+    success: true,
+    user: { id: userId, email, phone, name },
+    sessionId
+  });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { identifier, password } = req.body; // identifier can be email or phone
+
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Email/phone and password are required' });
+  }
+
+  const user = users.get(identifier);
+  if (!user || user.password !== password) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  // Create session
+  const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  userSessions.set(sessionId, user.id);
+
+  res.json({
+    success: true,
+    user: { id: user.id, email: user.email, phone: user.phone, name: user.name },
+    sessionId
+  });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  const { sessionId } = req.body;
+
+  if (sessionId && userSessions.has(sessionId)) {
+    userSessions.delete(sessionId);
+  }
+
+  res.json({ success: true });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!sessionId || !userSessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const userId = userSessions.get(sessionId);
+  const user = Array.from(users.values()).find(u => u.id === userId);
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found' });
+  }
+
+  res.json({
+    user: { id: user.id, email: user.email, phone: user.phone, name: user.name }
+  });
+});
+
+// User account endpoints
+app.get('/api/user/orders', (req, res) => {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!sessionId || !userSessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const userId = userSessions.get(sessionId);
+  const userOrders = orders.filter(order => order.userId === userId);
+
+  res.json(userOrders);
+});
+
+app.post('/api/user/reorder/:orderId', (req, res) => {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+  const { orderId } = req.params;
+
+  if (!sessionId || !userSessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const userId = userSessions.get(sessionId);
+  const originalOrder = orders.find(order => order.id === parseInt(orderId) && order.userId === userId);
+
+  if (!originalOrder) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+
+  // Clear current cart and add items from the original order
+  shoppingCarts.set(userId, originalOrder.items.map(item => ({
+    ...item,
+    addedAt: new Date()
+  })));
+
+  res.json({
+    success: true,
+    message: 'Items added to cart',
+    cartCount: originalOrder.items.reduce((sum, item) => sum + item.quantity, 0)
+  });
+});
+
+app.get('/api/user/profile', (req, res) => {
+  const sessionId = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!sessionId || !userSessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const userId = userSessions.get(sessionId);
+  const user = Array.from(users.values()).find(u => u.id === userId);
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found' });
+  }
+
+  const userOrders = orders.filter(order => order.userId === userId);
+  const totalSpent = userOrders.reduce((sum, order) => sum + order.total, 0);
+
+  res.json({
+    user: { id: user.id, email: user.email, phone: user.phone, name: user.name },
+    stats: {
+      totalOrders: userOrders.length,
+      totalSpent: totalSpent,
+      memberSince: user.createdAt
+    }
+  });
 });
 
 // Admin API endpoints
@@ -420,19 +728,45 @@ app.get('/admin/orders', (req, res) => {
 });
 
 app.get('/admin/accounts', (req, res) => {
-  // Get unique users from shopping carts and orders
+  // Get all registered users and their activity
   const accounts = new Map();
+
+  // Add registered users
+  for (const [identifier, user] of users.entries()) {
+    accounts.set(user.id, {
+      userId: user.id,
+      email: user.email,
+      phone: user.phone,
+      name: user.name,
+      isRegistered: true,
+      createdAt: user.createdAt,
+      cartItems: 0,
+      totalCartValue: 0,
+      lastActivity: user.createdAt,
+      orders: []
+    });
+  }
 
   // Add users from shopping carts
   for (const [userId, cart] of shoppingCarts.entries()) {
     if (!accounts.has(userId)) {
       accounts.set(userId, {
         userId,
+        email: null,
+        phone: null,
+        name: 'Guest User',
+        isRegistered: false,
+        createdAt: new Date(),
         cartItems: cart.length,
         totalCartValue: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
         lastActivity: new Date(),
         orders: []
       });
+    } else {
+      const account = accounts.get(userId);
+      account.cartItems = cart.length;
+      account.totalCartValue = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      account.lastActivity = new Date();
     }
   }
 
@@ -441,14 +775,22 @@ app.get('/admin/accounts', (req, res) => {
     if (!accounts.has(order.userId)) {
       accounts.set(order.userId, {
         userId: order.userId,
+        email: null,
+        phone: null,
+        name: 'Guest User',
+        isRegistered: false,
+        createdAt: order.createdAt,
         cartItems: 0,
         totalCartValue: 0,
         lastActivity: order.createdAt,
         orders: [order]
       });
     } else {
-      accounts.get(order.userId).orders.push(order);
-      accounts.get(order.userId).lastActivity = order.createdAt;
+      const account = accounts.get(order.userId);
+      account.orders.push(order);
+      if (order.createdAt > account.lastActivity) {
+        account.lastActivity = order.createdAt;
+      }
     }
   });
 
@@ -468,6 +810,57 @@ app.put('/admin/orders/:orderId/status', (req, res) => {
   order.updatedAt = new Date();
 
   res.json({ success: true, order });
+});
+
+// Admin payment endpoints
+app.get('/admin/payments', (req, res) => {
+  res.json(Array.from(payments.values()));
+});
+
+app.get('/admin/payment-settings', (req, res) => {
+  res.json(paymentSettings);
+});
+
+app.put('/admin/payment-settings', (req, res) => {
+  const { bankTransfer, openBanking, paypal } = req.body;
+
+  if (bankTransfer) {
+    paymentSettings.bankTransfer = { ...paymentSettings.bankTransfer, ...bankTransfer };
+  }
+
+  if (openBanking) {
+    paymentSettings.openBanking = { ...paymentSettings.openBanking, ...openBanking };
+  }
+
+  if (paypal) {
+    paymentSettings.paypal = { ...paymentSettings.paypal, ...paypal };
+  }
+
+  res.json({ success: true, settings: paymentSettings });
+});
+
+app.put('/admin/payments/:paymentId/status', (req, res) => {
+  const { paymentId } = req.params;
+  const { status, notes } = req.body;
+
+  const payment = payments.get(paymentId);
+  if (!payment) {
+    return res.status(404).json({ error: 'Payment not found' });
+  }
+
+  payment.status = status;
+  payment.adminNotes = notes;
+  payment.updatedAt = new Date();
+
+  // Update related order status
+  if (status === 'confirmed') {
+    const order = orders.find(o => o.id === payment.orderId);
+    if (order && order.status === 'pending_payment') {
+      order.status = 'confirmed';
+    }
+  }
+
+  res.json({ success: true, payment });
 });
 
 app.listen(PORT, () => {
