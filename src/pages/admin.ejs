@@ -1162,6 +1162,20 @@
             document.getElementById('averageOrderValue').textContent = '£' + avgOrderValue.toFixed(2);
         }
 
+        // Payments Management (Manual Cash System)
+        function loadPayments() {
+            const container = document.getElementById('paymentsContainer');
+            container.innerHTML = '<div style="text-align: center; padding: 2rem;"><h3>Manual Cash Payment System</h3><p>All payments are handled manually through cash transactions.<br>Use the Orders tab to track and manage orders.</p></div>';
+        }
+
+        function showBankingModal() {
+            alert('Manual cash system - no banking details needed');
+        }
+
+        function closeBankingModal() {
+            // Not needed for manual cash system
+        }
+
         // Product form submission
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
