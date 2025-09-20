@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Essex - Premium Open Source Admin</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #22c55e;
+            --secondary-color: #16a34a;
+            --accent-color: #059669;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        .admin-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            color: #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(8px);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-premium {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.5s ease;
+        }
+
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .product-form {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            margin: 2rem auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed #22c55e;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .file-drop-zone:hover {
+            background: #e9ecef;
+            border-color: #16a34a;
+        }
+
+        .file-drop-zone.dragover {
+            background: #d1fae5;
+            border-color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container-fluid p-4">
+        <div class="admin-container row g-0">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar text-white p-4">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">
+                        <i class="fas fa-leaf me-2"></i>Raw Essex
+                    </h3>
+                    <p class="small opacity-75">Premium Open Source Admin</p>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'dashboard' }" @click="setActiveTab('dashboard')">
+                        <i class="fas fa-chart-line me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'products' }" @click="setActiveTab('products')">
+                        <i class="fas fa-box me-2"></i> Products
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'orders' }" @click="setActiveTab('orders')">
+                        <i class="fas fa-shopping-cart me-2"></i> Orders
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'customers' }" @click="setActiveTab('customers')">
+                        <i class="fas fa-users me-2"></i> Customers
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'payments' }" @click="setActiveTab('payments')">
+                        <i class="fas fa-credit-card me-2"></i> Payments
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'analytics' }" @click="setActiveTab('analytics')">
+                        <i class="fas fa-chart-bar me-2"></i> Analytics
+                    </a>
+                    <a class="nav-link text-white nav-item" :class="{ active: activeTab === 'stripe' }" @click="setActiveTab('stripe')">
+                        <i class="fas fa-credit-card me-2"></i> Stripe Config
+                    </a>
+                </nav>
+
+                <div class="mt-auto pt-4">
+                    <div class="text-center small opacity-75">
+                        <p><i class="fas fa-code me-1"></i> Open Source</p>
+                        <p><i class="fas fa-server me-1"></i> Vue.js + Express</p>
+                        <p><i class="fas fa-shield-alt me-1"></i> Premium Features</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 p-4">
+                <transition name="fade" mode="out-in">
+                    <!-- Dashboard -->
+                    <div v-if="activeTab === 'dashboard'" key="dashboard">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Dashboard Overview</h2>
+                            <button class="btn btn-premium" @click="refreshData">
+                                <i class="fas fa-sync-alt me-2"></i>Refresh
+                            </button>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-3" v-for="stat in stats" :key="stat.title">
+                                <div class="card stat-card text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-title">{{ stat.title }}</h6>
+                                                <h3 class="fw-bold">{{ stat.value }}</h3>
+                                                <small class="opacity-75">{{ stat.subtitle }}</small>
+                                            </div>
+                                            <i :class="stat.icon" class="fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">Recent Orders</h5>
+                                    <canvas id="ordersChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">System Status</h5>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success rounded-circle me-3" style="width: 12px; height: 12px;"></div>
+                                        <span>Server Online</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success rounded-circle me-3" style="width: 12px; height: 12px;"></div>
+                                        <span>Database Connected</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-warning rounded-circle me-3" style="width: 12px; height: 12px;"></div>
+                                        <span>Payment System: Manual</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products -->
+                    <div v-else-if="activeTab === 'products'" key="products">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Products Management</h2>
+                            <button class="btn btn-premium" @click="showAddProductForm">
+                                <i class="fas fa-plus me-2"></i>Add Product
+                            </button>
+                        </div>
+
+                        <div class="data-table p-4">
+                            <div v-if="loading" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>Loading products...</p>
+                            </div>
+                            <div v-else>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Image</th>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Price</th>
+                                                <th>Category</th>
+                                                <th>Stock</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="product in products" :key="product.id">
+                                                <td>
+                                                    <img :src="product.image || '/images/no-image.jpg'"
+                                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                                         @error="handleImageError">
+                                                </td>
+                                                <td>{{ product.id }}</td>
+                                                <td>{{ product.name }}</td>
+                                                <td>${{ product.price }}</td>
+                                                <td>{{ product.category }}</td>
+                                                <td>
+                                                    <span class="badge bg-success" v-if="product.status === 'in_stock'">In Stock</span>
+                                                    <span class="badge bg-danger" v-else>Out of Stock</span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-2" @click="editProduct(product)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" @click="deleteProduct(product.id)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders -->
+                    <div v-else-if="activeTab === 'orders'" key="orders">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Orders Management</h2>
+                            <button class="btn btn-premium" @click="loadOrders">
+                                <i class="fas fa-refresh me-2"></i>Refresh
+                            </button>
+                        </div>
+
+                        <div class="data-table p-4">
+                            <div v-if="orders.length === 0" class="text-center text-muted py-5">
+                                <i class="fas fa-shopping-cart fs-1 mb-3"></i>
+                                <h5>No orders found</h5>
+                                <p>When customers place orders, they will appear here.</p>
+                            </div>
+                            <div v-else>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Total</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="order in orders" :key="order.id">
+                                                <td>{{ order.id }}</td>
+                                                <td>{{ order.customerName }}</td>
+                                                <td>${{ order.total }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ order.status }}</span>
+                                                </td>
+                                                <td>{{ formatDate(order.createdAt) }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stripe Configuration -->
+                    <div v-else-if="activeTab === 'stripe'" key="stripe">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Stripe Configuration</h2>
+                            <button class="btn btn-premium" @click="testStripeConnection">
+                                <i class="fas fa-plug me-2"></i>Test Connection
+                            </button>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-4">API Configuration</h5>
+
+                                    <form @submit.prevent="saveStripeConfig">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label">Publishable Key</label>
+                                                <input type="text" class="form-control" v-model="stripeConfig.publishableKey"
+                                                       placeholder="pk_test_... or pk_live_..." required>
+                                                <small class="text-muted">Your Stripe publishable key (safe to expose publicly)</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Secret Key</label>
+                                                <input type="password" class="form-control" v-model="stripeConfig.secretKey"
+                                                       placeholder="sk_test_... or sk_live_..." required>
+                                                <small class="text-muted">Your Stripe secret key (keep this secure)</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Webhook Secret</label>
+                                                <input type="password" class="form-control" v-model="stripeConfig.webhookSecret"
+                                                       placeholder="whsec_...">
+                                                <small class="text-muted">Webhook endpoint secret for verifying webhook signatures</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Default Currency</label>
+                                                <select class="form-control" v-model="stripeConfig.currency">
+                                                    <option value="gbp">GBP (British Pound)</option>
+                                                    <option value="usd">USD (US Dollar)</option>
+                                                    <option value="eur">EUR (Euro)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2 mt-4">
+                                            <button type="submit" class="btn btn-premium" :disabled="savingStripe">
+                                                <i class="fas fa-save me-2"></i>{{ savingStripe ? 'Saving...' : 'Save Configuration' }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">Integration Info</h5>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Webhook Endpoint</h6>
+                                        <code class="small">{{ baseUrl }}/api/stripe/webhook</code>
+                                        <p class="small text-muted mt-2">Add this URL to your Stripe Dashboard webhooks</p>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Required Events</h6>
+                                        <ul class="small">
+                                            <li>payment_intent.succeeded</li>
+                                            <li>payment_intent.payment_failed</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Payment Intent API</h6>
+                                        <code class="small">{{ baseUrl }}/api/stripe/create-payment-intent</code>
+                                        <p class="small text-muted mt-2">Use this endpoint to create payments</p>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <small>
+                                            <strong>Setup Instructions:</strong><br>
+                                            1. Get your API keys from Stripe Dashboard<br>
+                                            2. Create a webhook endpoint<br>
+                                            3. Add the webhook secret here<br>
+                                            4. Test the connection
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="data-table p-4">
+                                    <h5 class="fw-bold mb-3">Recent Stripe Transactions</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Payment ID</th>
+                                                    <th>Amount</th>
+                                                    <th>Currency</th>
+                                                    <th>Status</th>
+                                                    <th>Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="payment in stripePayments" :key="payment.id">
+                                                    <td><code>{{ payment.id }}</code></td>
+                                                    <td>{{ payment.currency.toUpperCase() }} {{ payment.amount }}</td>
+                                                    <td>{{ payment.currency.toUpperCase() }}</td>
+                                                    <td>
+                                                        <span class="badge bg-success" v-if="payment.status === 'succeeded'">Succeeded</span>
+                                                        <span class="badge bg-danger" v-else>{{ payment.status }}</span>
+                                                    </td>
+                                                    <td>{{ formatDate(payment.createdAt) }}</td>
+                                                </tr>
+                                                <tr v-if="stripePayments.length === 0">
+                                                    <td colspan="5" class="text-center text-muted">No Stripe transactions yet</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other tabs placeholder -->
+                    <div v-else class="text-center py-5">
+                        <i class="fas fa-cogs fs-1 text-muted mb-3"></i>
+                        <h3 class="text-muted">{{ activeTab.charAt(0).toUpperCase() + activeTab.slice(1) }} Module</h3>
+                        <p class="text-muted">Premium {{ activeTab }} management features coming soon...</p>
+                        <button class="btn btn-premium" @click="setActiveTab('dashboard')">
+                            Back to Dashboard
+                        </button>
+                    </div>
+                </transition>
+            </div>
+        </div>
+
+        <!-- Product Form Modal -->
+        <div v-if="showProductForm" class="modal-overlay" @click="closeProductForm">
+            <div class="product-form p-4" @click.stop>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold">{{ editingProduct ? 'Edit Product' : 'Add New Product' }}</h4>
+                    <button class="btn-close" @click="closeProductForm"></button>
+                </div>
+
+                <form @submit.prevent="saveProduct">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name *</label>
+                            <input type="text" class="form-control" v-model="productForm.name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Price *</label>
+                            <input type="number" step="0.01" class="form-control" v-model="productForm.price" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category *</label>
+                            <select class="form-control" v-model="productForm.category" required>
+                                <option value="">Select Category</option>
+                                <option value="Raw Dog Food">Raw Dog Food</option>
+                                <option value="Organ Meats">Organ Meats</option>
+                                <option value="Natural Dog Treats">Natural Dog Treats</option>
+                                <option value="Dog Supplements">Dog Supplements</option>
+                                <option value="Cat Food">Cat Food</option>
+                                <option value="Bird Food">Bird Food</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Brand</label>
+                            <input type="text" class="form-control" v-model="productForm.brand">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="3" v-model="productForm.description"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Stock Status</label>
+                            <select class="form-control" v-model="productForm.status">
+                                <option value="in_stock">In Stock</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Product Image</label>
+                            <div class="file-drop-zone"
+                                 @drop="handleFileDrop"
+                                 @dragover.prevent
+                                 @dragenter.prevent
+                                 @click="$refs.fileInput.click()">
+                                <div v-if="productForm.image">
+                                    <img :src="productForm.image" class="image-preview mb-3">
+                                    <p>Click to change image or drag new file here</p>
+                                </div>
+                                <div v-else>
+                                    <i class="fas fa-cloud-upload-alt fs-1 text-muted mb-3"></i>
+                                    <p>Click to upload image or drag file here</p>
+                                    <small class="text-muted">Supports JPG, PNG, GIF</small>
+                                </div>
+                            </div>
+                            <input type="file" ref="fileInput" @change="handleFileSelect" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary" @click="closeProductForm">Cancel</button>
+                        <button type="submit" class="btn btn-premium" :disabled="saving">
+                            <i class="fas fa-save me-2"></i>{{ saving ? 'Saving...' : 'Save Product' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'dashboard',
+                    loading: false,
+                    saving: false,
+                    showProductForm: false,
+                    editingProduct: null,
+                    stats: [
+                        { title: 'Products', value: '0', subtitle: 'Total items', icon: 'fas fa-box' },
+                        { title: 'Orders', value: '0', subtitle: 'This month', icon: 'fas fa-shopping-cart' },
+                        { title: 'Customers', value: '0', subtitle: 'Registered', icon: 'fas fa-users' },
+                        { title: 'Revenue', value: '$0', subtitle: 'This month', icon: 'fas fa-dollar-sign' }
+                    ],
+                    products: [],
+                    orders: [],
+                    customers: [],
+                    payments: [],
+                    productForm: {
+                        name: '',
+                        price: '',
+                        category: '',
+                        description: '',
+                        brand: '',
+                        status: 'in_stock',
+                        image: ''
+                    },
+                    stripeConfig: {
+                        publishableKey: '',
+                        secretKey: '',
+                        webhookSecret: '',
+                        currency: 'gbp'
+                    },
+                    stripePayments: [],
+                    savingStripe: false,
+                    baseUrl: window.location.origin
+                }
+            },
+            mounted() {
+                this.loadDashboardData();
+                this.initChart();
+            },
+            methods: {
+                setActiveTab(tab) {
+                    this.activeTab = tab;
+                    if (tab === 'products') this.loadProducts();
+                    if (tab === 'orders') this.loadOrders();
+                    if (tab === 'customers') this.loadCustomers();
+                    if (tab === 'payments') this.loadPayments();
+                    if (tab === 'stripe') this.loadStripePayments();
+                },
+
+                async loadDashboardData() {
+                    try {
+                        const [productsRes, ordersRes, customersRes, paymentsRes] = await Promise.all([
+                            axios.get('/admin/products'),
+                            axios.get('/api/orders'),
+                            axios.get('/api/accounts'),
+                            axios.get('/api/payments')
+                        ]);
+
+                        this.products = productsRes.data;
+                        this.orders = ordersRes.data;
+                        this.customers = customersRes.data;
+                        this.payments = paymentsRes.data;
+
+                        this.stats[0].value = this.products.length.toString();
+                        this.stats[1].value = this.orders.length.toString();
+                        this.stats[2].value = this.customers.length.toString();
+
+                        const totalRevenue = this.orders.reduce((sum, order) => sum + (order.total || 0), 0);
+                        this.stats[3].value = '$' + totalRevenue.toFixed(2);
+
+                    } catch (error) {
+                        console.error('Error loading dashboard data:', error);
+                        alert('Error loading dashboard data. Please check console for details.');
+                    }
+                },
+
+                async loadProducts() {
+                    this.loading = true;
+                    try {
+                        const response = await axios.get('/admin/products');
+                        this.products = response.data;
+                    } catch (error) {
+                        console.error('Error loading products:', error);
+                        alert('Error loading products.');
+                    }
+                    this.loading = false;
+                },
+
+                async loadOrders() {
+                    try {
+                        const response = await axios.get('/api/orders');
+                        this.orders = response.data;
+                    } catch (error) {
+                        console.error('Error loading orders:', error);
+                    }
+                },
+
+                async loadCustomers() {
+                    try {
+                        const response = await axios.get('/api/accounts');
+                        this.customers = response.data;
+                    } catch (error) {
+                        console.error('Error loading customers:', error);
+                    }
+                },
+
+                async loadPayments() {
+                    try {
+                        const response = await axios.get('/api/payments');
+                        this.payments = response.data;
+                    } catch (error) {
+                        console.error('Error loading payments:', error);
+                    }
+                },
+
+                showAddProductForm() {
+                    this.editingProduct = null;
+                    this.productForm = {
+                        name: '',
+                        price: '',
+                        category: '',
+                        description: '',
+                        brand: '',
+                        status: 'in_stock',
+                        image: ''
+                    };
+                    this.showProductForm = true;
+                },
+
+                editProduct(product) {
+                    this.editingProduct = product;
+                    this.productForm = { ...product };
+                    this.showProductForm = true;
+                },
+
+                closeProductForm() {
+                    this.showProductForm = false;
+                    this.editingProduct = null;
+                },
+
+                async saveProduct() {
+                    this.saving = true;
+                    try {
+                        const formData = new FormData();
+                        Object.keys(this.productForm).forEach(key => {
+                            if (key !== 'imageFile') {
+                                formData.append(key, this.productForm[key]);
+                            }
+                        });
+
+                        if (this.productForm.imageFile) {
+                            formData.append('image', this.productForm.imageFile);
+                        }
+
+                        let response;
+                        if (this.editingProduct) {
+                            response = await axios.put(`/admin/products/${this.editingProduct.id}`, this.productForm);
+                        } else {
+                            response = await axios.post('/admin/products', this.productForm);
+                        }
+
+                        alert(this.editingProduct ? 'Product updated successfully!' : 'Product added successfully!');
+                        this.closeProductForm();
+                        this.loadProducts();
+                        this.loadDashboardData();
+
+                    } catch (error) {
+                        console.error('Error saving product:', error);
+                        alert('Error saving product. Please check console for details.');
+                    }
+                    this.saving = false;
+                },
+
+                async deleteProduct(productId) {
+                    if (confirm('Are you sure you want to delete this product?')) {
+                        try {
+                            await axios.delete(`/admin/products/${productId}`);
+                            alert('Product deleted successfully!');
+                            this.loadProducts();
+                            this.loadDashboardData();
+                        } catch (error) {
+                            console.error('Error deleting product:', error);
+                            alert('Error deleting product.');
+                        }
+                    }
+                },
+
+                handleFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.processImageFile(file);
+                    }
+                },
+
+                handleFileDrop(event) {
+                    event.preventDefault();
+                    const file = event.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        this.processImageFile(file);
+                    }
+                },
+
+                processImageFile(file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.productForm.image = e.target.result;
+                        this.productForm.imageFile = file;
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                handleImageError(event) {
+                    event.target.src = '/images/no-image.jpg';
+                },
+
+                refreshData() {
+                    this.loadDashboardData();
+                },
+
+                formatDate(dateString) {
+                    if (!dateString) return 'N/A';
+                    return new Date(dateString).toLocaleDateString();
+                },
+
+                async saveStripeConfig() {
+                    this.savingStripe = true;
+                    try {
+                        const response = await axios.post('/admin/stripe/configure', this.stripeConfig);
+                        alert('Stripe configuration saved successfully!');
+                        this.loadStripePayments();
+                    } catch (error) {
+                        console.error('Error saving Stripe config:', error);
+                        alert('Error saving Stripe configuration.');
+                    }
+                    this.savingStripe = false;
+                },
+
+                async testStripeConnection() {
+                    try {
+                        const response = await axios.get('/api/stripe/config');
+                        if (response.data.publishableKey !== 'pk_test_placeholder') {
+                            alert('Stripe connection test successful!');
+                        } else {
+                            alert('Please configure your Stripe keys first.');
+                        }
+                    } catch (error) {
+                        console.error('Error testing Stripe connection:', error);
+                        alert('Stripe connection test failed.');
+                    }
+                },
+
+                async loadStripePayments() {
+                    try {
+                        const response = await axios.get('/api/payments');
+                        this.stripePayments = response.data.filter(payment => payment.method === 'stripe');
+                    } catch (error) {
+                        console.error('Error loading Stripe payments:', error);
+                    }
+                },
+
+                initChart() {
+                    this.$nextTick(() => {
+                        const ctx = document.getElementById('ordersChart');
+                        if (ctx) {
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                                    datasets: [{
+                                        label: 'Orders',
+                                        data: [12, 19, 3, 5, 2, 3],
+                                        borderColor: '#22c55e',
+                                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

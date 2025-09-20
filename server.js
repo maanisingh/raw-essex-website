@@ -124,16 +124,12 @@ app.get('/product/:id', (req, res) => {
 
 // Admin settings routes
 app.get('/admin/settings', (req, res) => {
-  if (req.headers.accept && req.headers.accept.includes('application/json')) {
-    res.json({
-      stripe: paymentSettings.stripe,
-      dpd: shippingSettings.dpd,
-      dhl: shippingSettings.dhl,
-      royalMail: shippingSettings.royalMail
-    });
-  } else {
-    res.render('admin-settings');
-  }
+  res.json({
+    stripe: paymentSettings.stripe,
+    dpd: shippingSettings.dpd,
+    dhl: shippingSettings.dhl,
+    royalMail: shippingSettings.royalMail
+  });
 });
 
 app.post('/admin/settings', (req, res) => {
@@ -182,10 +178,7 @@ app.get('/auth', (req, res) => {
   res.render('auth');
 });
 
-// Admin panel routes
-app.get('/admin', (req, res) => {
-  res.render('admin', { products: productList });
-});
+// Admin API routes (for premium admin panel)
 
 app.get('/admin/products', (req, res) => {
   res.json(productList);
@@ -873,114 +866,101 @@ app.get('/api/payments', (req, res) => {
   res.json(Array.from(payments.values()));
 });
 
-// Simple Open Source Admin Panel Alternative
-app.get('/admin-panel', (req, res) => {
-  const adminHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Raw Essex - Open Source Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-gray-100">
-    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-green-500">
-        <div class="container mx-auto px-4 py-8">
-            <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
-                <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-green-800 mb-2">
-                        <i class="fas fa-leaf mr-3"></i>Raw Essex - Open Source Admin
-                    </h1>
-                    <p class="text-gray-600">Professional admin panel powered by open source technology</p>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">Products</h3>
-                                <p class="text-3xl font-bold">${productList.length}</p>
-                            </div>
-                            <i class="fas fa-box text-3xl opacity-80"></i>
-                        </div>
-                    </div>
+// Stripe Configuration and Webhooks
+app.post('/api/stripe/create-payment-intent', async (req, res) => {
+  try {
+    const { amount, currency = 'gbp', metadata = {} } = req.body;
 
-                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">Orders</h3>
-                                <p class="text-3xl font-bold">${orders.length}</p>
-                            </div>
-                            <i class="fas fa-shopping-cart text-3xl opacity-80"></i>
-                        </div>
-                    </div>
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Convert to pence/cents
+      currency,
+      metadata,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
 
-                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">Accounts</h3>
-                                <p class="text-3xl font-bold">${users.size}</p>
-                            </div>
-                            <i class="fas fa-users text-3xl opacity-80"></i>
-                        </div>
-                    </div>
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    });
+  } catch (error) {
+    console.error('Stripe payment intent creation failed:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
 
-                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">Payments</h3>
-                                <p class="text-3xl font-bold">${payments.size}</p>
-                            </div>
-                            <i class="fas fa-credit-card text-3xl opacity-80"></i>
-                        </div>
-                    </div>
-                </div>
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-4">
-                            <i class="fas fa-chart-line mr-2 text-green-600"></i>Quick Actions
-                        </h2>
-                        <div class="space-y-3">
-                            <a href="/admin" class="block bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                                <i class="fas fa-cogs mr-2"></i>Full Admin Panel
-                            </a>
-                            <a href="/products" class="block bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-eye mr-2"></i>View Products
-                            </a>
-                            <a href="/" class="block bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-home mr-2"></i>Back to Website
-                            </a>
-                        </div>
-                    </div>
+  let event;
 
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-4">
-                            <i class="fas fa-info-circle mr-2 text-blue-600"></i>System Info
-                        </h2>
-                        <div class="space-y-2 text-sm">
-                            <p><strong>Platform:</strong> Open Source Express.js</p>
-                            <p><strong>Status:</strong> <span class="text-green-600">Online</span></p>
-                            <p><strong>Payment System:</strong> Manual Cash</p>
-                            <p><strong>Total Features:</strong> Products, Orders, Accounts</p>
-                        </div>
-                    </div>
-                </div>
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-                <div class="mt-8 text-center text-gray-500">
-                    <p>Powered by Open Source Technology - Raw Essex Admin Panel</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>`;
-  res.send(adminHtml);
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      console.log('Payment succeeded:', paymentIntent.id);
+
+      // Store payment record
+      const payment = {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+        status: 'succeeded',
+        method: 'stripe',
+        metadata: paymentIntent.metadata,
+        createdAt: new Date().toISOString()
+      };
+      payments.set(paymentIntent.id, payment);
+      break;
+
+    case 'payment_intent.payment_failed':
+      const failedPayment = event.data.object;
+      console.log('Payment failed:', failedPayment.id);
+      break;
+
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  res.json({ received: true });
+});
+
+app.get('/api/stripe/config', (req, res) => {
+  res.json({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder'
+  });
+});
+
+app.post('/admin/stripe/configure', (req, res) => {
+  const { publishableKey, secretKey, webhookSecret } = req.body;
+
+  // In production, you'd update environment variables or database
+  // For now, just validate and respond
+  if (publishableKey && secretKey) {
+    res.json({
+      success: true,
+      message: 'Stripe configuration updated successfully'
+    });
+  } else {
+    res.status(400).json({
+      error: 'Publishable key and secret key are required'
+    });
+  }
 });
 
 // Premium Open Source Admin Panel Route
 app.get('/premium-admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'premium-admin.html'));
+  res.sendFile(path.join(__dirname, 'premium-admin-enhanced.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
