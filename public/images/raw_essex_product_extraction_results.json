@@ -1,0 +1,228 @@
+{
+  "extraction_summary": {
+    "total_products_found": 594,
+    "pages_to_extract": 25,
+    "products_per_page": 20,
+    "main_collections_url": "https://rawessex.co.uk/collections/all",
+    "category_breakdowns": {
+      "dogs": {
+        "total_products": 519,
+        "pages": 22,
+        "subcategories": [
+          {"name": "Dog Dry Food", "count": 23},
+          {"name": "Dog Treats", "count": 53},
+          {"name": "Dog Raw Food", "count": 195},
+          {"name": "Dog Supplements", "count": 57},
+          {"name": "Dog Accessories", "count": 36}
+        ]
+      },
+      "cats": {
+        "total_products": 60,
+        "pages": 3
+      },
+      "birds": {
+        "total_products": 8,
+        "pages": 1
+      },
+      "small_animals": {
+        "total_products": 19,
+        "pages": 1
+      }
+    },
+    "stock_status": {
+      "in_stock": 503,
+      "out_of_stock": 91
+    }
+  },
+  "sample_products": [
+    {
+      "name": "1KG Boar CHUNKS locally sourced",
+      "price": 6.50,
+      "currency": "GBP",
+      "category": "Dog Raw Food",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/1kg-boar-chunks-locally-sourced",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/Boar-Chunk.png",
+      "vendor": "Dogs Butcher",
+      "description": "Locally sourced boar chunks for dogs"
+    },
+    {
+      "name": "1KG Meaty Ox CHUNKS. Locally Sourced prime cuts of beef.",
+      "price": 10.00,
+      "currency": "GBP",
+      "category": "Dog Raw Food",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/1kg-meaty-ox-chunks-locally-sourced-prime-cuts-of-beef",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/Meaty-Ox-Chunks.png",
+      "vendor": "Raw Essex",
+      "description": "Premium locally sourced prime cuts of beef"
+    },
+    {
+      "name": "1kg of Lamb Ribs",
+      "price": 5.00,
+      "currency": "GBP",
+      "category": "Natural Dog Treats",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/1kg-of-lamb-ribs",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/DIY-Lamb-Ribs-loose.jpg",
+      "vendor": "Raw Essex",
+      "description": "Natural lamb ribs for dogs"
+    },
+    {
+      "name": "Anco Fusions Beef & Venison",
+      "price": 3.25,
+      "currency": "GBP",
+      "category": "Dog Treats",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/anco-fusions-beef-venison",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/22001.png_d4f662e2d45836f1d99a1684a879b86e.webp",
+      "vendor": "Raw Essex",
+      "description": "Beef and venison fusion treats"
+    },
+    {
+      "name": "Canagan Fish Freeze Dried Food Toppers",
+      "price": 6.00,
+      "currency": "GBP",
+      "category": "Dog Supplements",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/canagan-fish-freeze-dried-food-toppers",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/canagan-dog-food-topper-raw-freeze-dried-fish-50g-p2715-4811_medium_02c8bcb7-452d-41ae-b62c-af6b6e27533c.png",
+      "vendor": "Raw Essex",
+      "description": "Freeze dried fish food toppers"
+    },
+    {
+      "name": "Canagans for Cats Chicken",
+      "price": 1.59,
+      "currency": "GBP",
+      "category": "Cat Wet Food",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/canagans-for-cats-chicken",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/00912481-large.jpg",
+      "vendor": "Raw Essex",
+      "description": "Chicken wet food for cats"
+    },
+    {
+      "name": "Dougies Duck Raw",
+      "price": 3.50,
+      "currency": "GBP",
+      "category": "Dog Raw Food",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/dougies-duck-raw",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/duck-80-10-10.jpg",
+      "vendor": "Raw Essex",
+      "description": "Raw duck for dogs"
+    },
+    {
+      "name": "Kefir Paws Peanut Butter and Jelly",
+      "price": 7.50,
+      "currency": "GBP",
+      "category": "Bone Broths",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/kefir-paws-peanut-butter-and-jelly",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/IMG_8104.jpg",
+      "vendor": "Raw Essex",
+      "description": "Peanut butter and jelly flavored kefir"
+    },
+    {
+      "name": "Sage Serenity Lead",
+      "price": 10.00,
+      "currency": "GBP",
+      "category": "Dog Accessories",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/sage-serenity-lead",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/108_b6505d20-5010-4e16-9247-ffd5d3a69885.webp",
+      "vendor": "Raw Essex",
+      "description": "Sage colored dog lead"
+    },
+    {
+      "name": "Basics Sunflowers Hearts",
+      "price": 2.00,
+      "currency": "GBP",
+      "category": "Bird Feed",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/basics-sunflowers-hearts",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/sunflower-hearts.jpg",
+      "vendor": "Raw Essex",
+      "description": "Sunflower hearts for birds"
+    },
+    {
+      "name": "Norah's Banana Slices Small Animal Treats",
+      "price": 3.99,
+      "currency": "GBP",
+      "category": "Small Animal Food",
+      "availability": "Sold out",
+      "productUrl": "https://rawessex.co.uk/products/norahs-banana-slices-small-animal-treats",
+      "imageUrl": "https://www.rawessex.co.uk/cdn/shop/files/banana-slices.jpg",
+      "vendor": "Raw Essex",
+      "description": "Banana slice treats for small animals"
+    }
+  ],
+  "extraction_urls_needed": [
+    "https://rawessex.co.uk/collections/all?page=1",
+    "https://rawessex.co.uk/collections/all?page=2",
+    "https://rawessex.co.uk/collections/all?page=3",
+    "https://rawessex.co.uk/collections/all?page=4",
+    "https://rawessex.co.uk/collections/all?page=5",
+    "https://rawessex.co.uk/collections/all?page=6",
+    "https://rawessex.co.uk/collections/all?page=7",
+    "https://rawessex.co.uk/collections/all?page=8",
+    "https://rawessex.co.uk/collections/all?page=9",
+    "https://rawessex.co.uk/collections/all?page=10",
+    "https://rawessex.co.uk/collections/all?page=11",
+    "https://rawessex.co.uk/collections/all?page=12",
+    "https://rawessex.co.uk/collections/all?page=13",
+    "https://rawessex.co.uk/collections/all?page=14",
+    "https://rawessex.co.uk/collections/all?page=15",
+    "https://rawessex.co.uk/collections/all?page=16",
+    "https://rawessex.co.uk/collections/all?page=17",
+    "https://rawessex.co.uk/collections/all?page=18",
+    "https://rawessex.co.uk/collections/all?page=19",
+    "https://rawessex.co.uk/collections/all?page=20",
+    "https://rawessex.co.uk/collections/all?page=21",
+    "https://rawessex.co.uk/collections/all?page=22",
+    "https://rawessex.co.uk/collections/all?page=23",
+    "https://rawessex.co.uk/collections/all?page=24",
+    "https://rawessex.co.uk/collections/all?page=25"
+  ],
+  "product_schema": {
+    "name": "string - Product name",
+    "price": "number - Price in GBP",
+    "currency": "string - Always GBP",
+    "category": "string - Product category",
+    "availability": "string - 'Sold out' or 'Add to cart' or 'In stock'",
+    "productUrl": "string - Full URL to product page",
+    "imageUrl": "string - Full URL to product image",
+    "vendor": "string - Product vendor/brand",
+    "description": "string - Product description"
+  },
+  "categories_found": [
+    "Dog Raw Food",
+    "Dog Treats",
+    "Natural Dog Treats",
+    "Dog Supplements",
+    "Dog Accessories",
+    "Dog Dry Food",
+    "Cat Wet Food",
+    "Cat Supplements",
+    "Cat Dry Food",
+    "Bird Feed",
+    "Small Animal Food",
+    "Bone Broths"
+  ],
+  "vendors_found": [
+    "Raw Essex",
+    "Dogs Butcher",
+    "We Love Raw",
+    "Canagan",
+    "Anco",
+    "Dougie's",
+    "Kefir Paws",
+    "Norah's"
+  ],
+  "notes": {
+    "most_products_sold_out": "The majority of products are currently marked as 'Sold out'",
+    "price_range": "£1.59 to £23.00",
+    "image_quality": "Most products have high-quality product images",
+    "brand_diversity": "Multiple brands available including house brand 'Raw Essex'"
+  }
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Raw Meat for Pets - Raw Essex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Questrial:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Questrial', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a4c24;
+            background-color: #f8fdf9;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a4c24, #2d7c47);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(26, 76, 36, 0.3);
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Archivo', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 10px;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            font-family: 'Archivo', sans-serif;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255,255,255,0.2);
+            color: #7dd87f;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 76, 36, 0.9), rgba(45, 124, 71, 0.9)),
+                        url('/images/hero-pet.jpg') center/cover;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            border-radius: 30px;
+            margin-bottom: 4rem;
+        }
+        .hero h1 {
+            font-family: 'Archivo', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .content-section {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.1);
+        }
+        .content-section h2 {
+            font-family: 'Archivo', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a4c24;
+        }
+        .content-section h3 {
+            font-family: 'Archivo', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #2d7c47;
+        }
+        .content-section p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            color: #4b5563;
+        }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .benefit-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid #22c55e;
+        }
+        .benefit-card h4 {
+            font-family: 'Archivo', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1a4c24;
+        }
+        .benefit-card p {
+            color: #4b5563;
+            font-size: 1rem;
+        }
+        .video-container {
+            margin: 3rem 0;
+            text-align: center;
+        }
+        .video-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(26, 76, 36, 0.2);
+        }
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+        }
+        .scientific-facts {
+            background: linear-gradient(135deg, #1a4c24, #2d7c47);
+            color: white;
+            padding: 3rem;
+            border-radius: 25px;
+            margin: 3rem 0;
+        }
+        .scientific-facts h3 {
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .scientific-facts ul {
+            list-style: none;
+            padding: 0;
+        }
+        .scientific-facts li {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.1rem;
+        }
+        .scientific-facts li:last-child {
+            border-bottom: none;
+        }
+        .footer {
+            background: linear-gradient(135deg, #1a4c24, #2d7c47);
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="/images/raw-essex-logo.png" alt="Raw Essex Logo">
+                Raw Essex
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/why-raw" class="active">Why Raw?</a></li>
+                <li><a href="/feeding-guide">Feeding Guide</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/vet-advice">Vet Advice</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Why Raw Meat for Pets?</h1>
+            <p>Discover the science behind raw feeding and why it's the most natural, healthy diet for your beloved companions</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-section">
+            <h2>The Natural Diet Your Pet Deserves</h2>
+            <p>Raw feeding, also known as the BARF diet (Biologically Appropriate Raw Food), mimics what dogs and cats would eat in the wild. Before domestication, canines and felines thrived on fresh, raw prey containing muscle meat, organ meat, and bones.</p>
+
+            <p>Modern commercial pet foods are heavily processed, often containing fillers, preservatives, and artificial additives that can cause digestive issues, allergies, and long-term health problems. Raw feeding returns your pet to their ancestral diet, providing optimal nutrition in its most bioavailable form.</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h4>🦷 Better Dental Health</h4>
+                    <p>Raw bones naturally clean teeth and strengthen jaw muscles, reducing plaque and bad breath</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>✨ Shinier Coat</h4>
+                    <p>High-quality proteins and natural oils result in healthier skin and a lustrous coat</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>💪 Improved Digestion</h4>
+                    <p>Natural enzymes and probiotics support healthy gut bacteria and easier digestion</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>⚡ Higher Energy</h4>
+                    <p>Bioavailable nutrients provide sustained energy without the sugar crashes from carb-heavy kibble</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>🎯 Allergy Relief</h4>
+                    <p>Single-protein diets help identify and eliminate food allergens causing skin and digestive issues</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>🏃 Better Weight Control</h4>
+                    <p>High protein, low carbohydrate diet naturally maintains ideal body weight and muscle mass</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>What Veterinarians Say About Raw Feeding</h2>
+            <p>An increasing number of veterinarians and animal nutritionists are recognizing the benefits of raw feeding when done correctly. Here's what the experts recommend:</p>
+
+            <div class="video-container">
+                <h3>Dr. Karen Becker: Raw Pet Food Benefits</h3>
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/bUGT9G4wsXk" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="video-container">
+                <h3>Veterinary Nutritionist on Raw Diets</h3>
+                <div class="video-embed">
+                    <iframe src="https://www.youtube.com/embed/B8lBRmr-QL8" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="scientific-facts">
+            <h3>🔬 Scientific Facts About Raw Feeding</h3>
+            <ul>
+                <li><strong>Digestive System Design:</strong> Dogs have a highly acidic stomach (pH 1-2) designed to break down raw meat and kill harmful bacteria</li>
+                <li><strong>Short Digestive Transit:</strong> Food moves through a dog's system in 4-6 hours, preventing bacterial overgrowth</li>
+                <li><strong>Enzyme Production:</strong> Raw foods contain natural enzymes that aid digestion, which are destroyed in processing</li>
+                <li><strong>Bioavailability:</strong> Nutrients in raw form are more easily absorbed than synthetic vitamins in processed foods</li>
+                <li><strong>Species Appropriate:</strong> Wild wolves and feral cats thrive on raw diets with no health issues related to "raw feeding"</li>
+                <li><strong>Reduced Inflammation:</strong> Raw diets are naturally anti-inflammatory, reducing arthritis and joint pain</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Common Myths About Raw Feeding</h2>
+
+            <h3>Myth: "Raw meat is dangerous and full of bacteria"</h3>
+            <p>Truth: Dogs and cats have evolved to handle bacteria in raw meat. Their acidic stomach environment and quick digestion time naturally prevent harmful bacterial overgrowth. Commercial pet food recalls for salmonella and other contaminants are actually more common than issues with properly sourced raw food.</p>
+
+            <h3>Myth: "Raw diets are nutritionally incomplete"</h3>
+            <p>Truth: A properly formulated raw diet including muscle meat, organ meat, and edible bones provides complete nutrition. Many commercial raw food companies follow AAFCO guidelines and work with veterinary nutritionists.</p>
+
+            <h3>Myth: "Raw feeding is too expensive"</h3>
+            <p>Truth: While initial costs may seem higher, many pet owners save money long-term through reduced vet bills, smaller portions needed (due to higher bioavailability), and elimination of costly treats and supplements.</p>
+
+            <h3>Myth: "Raw bones will break teeth"</h3>
+            <p>Truth: RAW bones are soft and pliable. It's COOKED bones that become brittle and dangerous. Raw bones actually help clean teeth and provide essential nutrients like calcium and phosphorus.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Ready to Start Raw Feeding?</h2>
+            <p>Transitioning to raw feeding should be done gradually and with proper guidance. We recommend:</p>
+            <ul style="font-size: 1.1rem; color: #4b5563; margin-left: 2rem;">
+                <li>Start with a single protein source (like chicken) for 2-3 weeks</li>
+                <li>Gradually introduce variety once your pet's digestive system adapts</li>
+                <li>Follow the 80/10/10 rule: 80% muscle meat, 10% organ meat, 10% edible bones</li>
+                <li>Consult with a raw feeding veterinarian or nutritionist</li>
+                <li>Keep detailed records of what works best for your pet</li>
+            </ul>
+            <p style="margin-top: 2rem;"><strong>Browse our complete selection of raw foods, supplements, and feeding guides to give your pet the nutrition they deserve!</strong></p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Raw Essex. Providing natural, species-appropriate nutrition for healthier, happier pets.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,408 @@
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
+const products = require('./src/data/products');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/pages'));
+
+let productList = [...products];
+
+// In-memory storage for demo (replace with database in production)
+let shoppingCarts = new Map(); // userId -> cart items
+let orders = [];
+let shippingSettings = {
+  dpd: { enabled: false, apiKey: '', pricePerKg: 5.99, freeShippingThreshold: 50 },
+  dhl: { enabled: false, apiKey: '', pricePerKg: 7.99, freeShippingThreshold: 75 },
+  royalMail: { enabled: true, apiKey: '', pricePerKg: 3.99, freeShippingThreshold: 30 }
+};
+let paymentSettings = {
+  stripe: { enabled: false, publicKey: '', secretKey: '' }
+};
+
+// Website routes
+app.get('/', (req, res) => {
+  res.render('home', { products: productList });
+});
+
+app.get('/products', (req, res) => {
+  const category = req.query.category;
+  const search = req.query.search;
+
+  let filteredProducts = productList;
+
+  if (category) {
+    filteredProducts = filteredProducts.filter(p => p.category === category);
+  }
+
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredProducts = filteredProducts.filter(p =>
+      p.name.toLowerCase().includes(searchLower) ||
+      p.description.toLowerCase().includes(searchLower) ||
+      p.category.toLowerCase().includes(searchLower) ||
+      (p.brand && p.brand.toLowerCase().includes(searchLower))
+    );
+  }
+
+  res.render('products', {
+    products: filteredProducts,
+    selectedCategory: category,
+    searchQuery: search || ''
+  });
+});
+
+// Educational pages
+app.get('/why-raw', (req, res) => {
+  res.render('why-raw');
+});
+
+app.get('/feeding-guide', (req, res) => {
+  res.render('feeding-guide');
+});
+
+app.get('/faq', (req, res) => {
+  res.render('faq');
+});
+
+app.get('/raw-benefits', (req, res) => {
+  res.render('raw-benefits');
+});
+
+app.get('/vet-advice', (req, res) => {
+  res.render('vet-advice');
+});
+
+// Admin settings routes
+app.get('/admin/settings', (req, res) => {
+  if (req.headers.accept && req.headers.accept.includes('application/json')) {
+    res.json({
+      stripe: paymentSettings.stripe,
+      dpd: shippingSettings.dpd,
+      dhl: shippingSettings.dhl,
+      royalMail: shippingSettings.royalMail
+    });
+  } else {
+    res.render('admin-settings');
+  }
+});
+
+app.post('/admin/settings', (req, res) => {
+  const { stripe, dpd, dhl, royalMail } = req.body;
+
+  if (stripe) {
+    paymentSettings.stripe = { ...paymentSettings.stripe, ...stripe };
+  }
+  if (dpd) {
+    shippingSettings.dpd = { ...shippingSettings.dpd, ...dpd };
+  }
+  if (dhl) {
+    shippingSettings.dhl = { ...shippingSettings.dhl, ...dhl };
+  }
+  if (royalMail) {
+    shippingSettings.royalMail = { ...shippingSettings.royalMail, ...royalMail };
+  }
+
+  res.json({ success: true, message: 'Settings updated successfully' });
+});
+
+app.get('/admin/test-settings', (req, res) => {
+  const results = {
+    stripe: {
+      status: paymentSettings.stripe.enabled ? 'Enabled' : 'Disabled',
+      message: paymentSettings.stripe.secretKey ? 'Secret key configured' : 'No secret key'
+    },
+    dpd: {
+      status: shippingSettings.dpd.enabled ? 'Enabled' : 'Disabled',
+      message: shippingSettings.dpd.apiKey ? 'API key configured' : 'No API key'
+    },
+    dhl: {
+      status: shippingSettings.dhl.enabled ? 'Enabled' : 'Disabled',
+      message: shippingSettings.dhl.apiKey ? 'API key configured' : 'No API key'
+    },
+    royalMail: {
+      status: shippingSettings.royalMail.enabled ? 'Enabled' : 'Disabled',
+      message: 'Standard shipping option'
+    }
+  };
+  res.json(results);
+});
+
+// Admin panel routes
+app.get('/admin', (req, res) => {
+  res.render('admin', { products: productList });
+});
+
+app.get('/admin/products', (req, res) => {
+  res.json(productList);
+});
+
+app.post('/admin/products', (req, res) => {
+  const newProduct = {
+    id: Date.now(),
+    ...req.body,
+    price: parseFloat(req.body.price)
+  };
+  productList.push(newProduct);
+  res.json(newProduct);
+});
+
+app.put('/admin/products/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const productIndex = productList.findIndex(p => p.id === id);
+
+  if (productIndex !== -1) {
+    productList[productIndex] = {
+      ...productList[productIndex],
+      ...req.body,
+      price: parseFloat(req.body.price)
+    };
+    res.json(productList[productIndex]);
+  } else {
+    res.status(404).json({ error: 'Product not found' });
+  }
+});
+
+app.delete('/admin/products/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const productIndex = productList.findIndex(p => p.id === id);
+
+  if (productIndex !== -1) {
+    const deletedProduct = productList.splice(productIndex, 1)[0];
+    res.json(deletedProduct);
+  } else {
+    res.status(404).json({ error: 'Product not found' });
+  }
+});
+
+// File upload endpoint for CMS
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images/')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+  }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/admin/upload-csv', upload.single('csvFile'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  try {
+    // Read the uploaded file
+    const csvContent = fs.readFileSync(req.file.path, 'utf8');
+
+    // Parse CSV and add products (basic implementation)
+    const lines = csvContent.split('\n');
+    const headers = lines[0].split(',');
+
+    let importedCount = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',');
+      if (values.length >= 5) {
+        const newProduct = {
+          id: Date.now() + i,
+          name: values[0]?.trim() || '',
+          price: parseFloat(values[1]) || 0,
+          category: values[2]?.trim() || '',
+          description: values[3]?.trim() || '',
+          status: values[4]?.trim() || 'in_stock',
+          image: values[5]?.trim() || '/images/default.jpg'
+        };
+
+        if (newProduct.name && newProduct.price > 0) {
+          productList.push(newProduct);
+          importedCount++;
+        }
+      }
+    }
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      message: `Successfully imported ${importedCount} products`,
+      count: importedCount,
+      totalProducts: productList.length
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Error processing CSV file' });
+  }
+});
+
+// Image upload endpoint
+app.post('/admin/upload-image', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No image uploaded' });
+  }
+
+  const imageUrl = '/images/' + req.file.filename;
+  res.json({ imageUrl: imageUrl });
+});
+
+// Search endpoint for admin
+app.get('/admin/search', (req, res) => {
+  const search = req.query.q;
+  const category = req.query.category;
+
+  let filteredProducts = productList;
+
+  if (category && category !== 'all') {
+    filteredProducts = filteredProducts.filter(p => p.category === category);
+  }
+
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredProducts = filteredProducts.filter(p =>
+      p.name.toLowerCase().includes(searchLower) ||
+      p.description.toLowerCase().includes(searchLower) ||
+      (p.brand && p.brand.toLowerCase().includes(searchLower))
+    );
+  }
+
+  res.json(filteredProducts);
+});
+
+// Get all categories
+app.get('/admin/categories', (req, res) => {
+  const categories = [...new Set(productList.map(p => p.category))];
+  res.json(categories);
+});
+
+// Export products as CSV
+app.get('/admin/export-csv', (req, res) => {
+  const csvHeader = 'Name,Price,Category,Description,Status,Image\n';
+  const csvRows = productList.map(p =>
+    `"${p.name}","${p.price}","${p.category}","${p.description}","${p.status}","${p.image}"`
+  ).join('\n');
+
+  const csvContent = csvHeader + csvRows;
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="raw-essex-products.csv"');
+  res.send(csvContent);
+});
+
+// Shopping Cart API Routes
+app.get('/api/cart/:userId', (req, res) => {
+  const userId = req.params.userId;
+  const cart = shoppingCarts.get(userId) || [];
+  res.json(cart);
+});
+
+app.post('/api/cart/:userId/add', (req, res) => {
+  const userId = req.params.userId;
+  const { productId, quantity = 1 } = req.body;
+
+  const product = productList.find(p => p.id == productId);
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+
+  let cart = shoppingCarts.get(userId) || [];
+  const existingItem = cart.find(item => item.productId == productId);
+
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    cart.push({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: quantity,
+      image: product.image
+    });
+  }
+
+  shoppingCarts.set(userId, cart);
+  res.json({ success: true, cartCount: cart.reduce((sum, item) => sum + item.quantity, 0) });
+});
+
+app.delete('/api/cart/:userId/remove/:productId', (req, res) => {
+  const userId = req.params.userId;
+  const productId = req.params.productId;
+
+  let cart = shoppingCarts.get(userId) || [];
+  cart = cart.filter(item => item.productId != productId);
+
+  shoppingCarts.set(userId, cart);
+  res.json({ success: true });
+});
+
+app.post('/api/cart/:userId/update', (req, res) => {
+  const userId = req.params.userId;
+  const { productId, quantity } = req.body;
+
+  let cart = shoppingCarts.get(userId) || [];
+  const item = cart.find(item => item.productId == productId);
+
+  if (item) {
+    if (quantity <= 0) {
+      cart = cart.filter(item => item.productId != productId);
+    } else {
+      item.quantity = quantity;
+    }
+  }
+
+  shoppingCarts.set(userId, cart);
+  res.json({ success: true });
+});
+
+// Checkout and Payment
+app.post('/api/checkout', async (req, res) => {
+  const { userId, paymentMethodId, shippingAddress } = req.body;
+  const cart = shoppingCarts.get(userId) || [];
+
+  if (cart.length === 0) {
+    return res.status(400).json({ error: 'Cart is empty' });
+  }
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  try {
+    const order = {
+      id: Date.now(),
+      userId,
+      items: cart,
+      total,
+      shippingAddress,
+      status: 'confirmed',
+      createdAt: new Date()
+    };
+
+    orders.push(order);
+    shoppingCarts.delete(userId);
+
+    res.json({ success: true, orderId: order.id });
+  } catch (error) {
+    res.status(500).json({ error: 'Payment processing failed' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Admin panel available at http://localhost:${PORT}/admin`);
+  console.log(`FAQ page available at http://localhost:${PORT}/faq`);
+  console.log(`Admin settings at http://localhost:${PORT}/admin/settings`);
+  console.log(`Now featuring ${productList.length} premium products!`);
+});
+
+module.exports = app;
