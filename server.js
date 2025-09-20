@@ -85,6 +85,11 @@ app.get('/vet-advice', (req, res) => {
   res.render('vet-advice');
 });
 
+// Cart page
+app.get('/cart', (req, res) => {
+  res.render('cart');
+});
+
 // Admin settings routes
 app.get('/admin/settings', (req, res) => {
   if (req.headers.accept && req.headers.accept.includes('application/json')) {

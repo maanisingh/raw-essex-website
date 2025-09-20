@@ -461,6 +461,7 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/products">All Products</a></li>
                 <li><a href="/faq">FAQ & Education</a></li>
+                <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                 <li><a href="/admin">Admin Panel</a></li>
             </ul>
         </nav>
@@ -614,6 +615,52 @@
                 observer.observe(card);
             });
         });
+
+        // Cart functionality
+        function getUserId() {
+            let userId = localStorage.getItem('rawEssexUserId');
+            if (!userId) {
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('rawEssexUserId', userId);
+            }
+            return userId;
+        }
+
+        function updateCartBadge(count) {
+            let badge = document.querySelector('.cart-badge');
+            if (!badge && count > 0) {
+                const cartLink = document.querySelector('a[href="/cart"]');
+                if (cartLink) {
+                    badge = document.createElement('span');
+                    badge.className = 'cart-badge';
+                    badge.style.cssText = 'background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8rem; margin-left: 5px;';
+                    cartLink.appendChild(badge);
+                }
+            }
+
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        async function loadCartCount() {
+            const userId = getUserId();
+            try {
+                const response = await fetch(`/api/cart/${userId}`);
+                const cart = await response.json();
+                const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+                updateCartBadge(totalCount);
+            } catch (error) {
+                console.error('Error loading cart count:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCartCount);
     </script>
 </body>
 </html>

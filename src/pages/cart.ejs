@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Raw Essex</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        .cart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto auto auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .item-details h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .quantity-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .quantity-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .cart-summary {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #eee;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .total-row {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .checkout-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .checkout-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-cart i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .continue-shopping {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .continue-shopping:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .cart-item {
+                grid-template-columns: 60px 1fr;
+                gap: 0.5rem;
+            }
+
+            .item-actions {
+                grid-column: span 2;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="/" class="logo">Raw Essex</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/why-raw">Why Raw?</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="cart-container">
+            <h1 class="page-title">Your Shopping Cart</h1>
+
+            <div id="cart-content" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading your cart...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate unique user ID if not exists
+        function getUserId() {
+            let userId = localStorage.getItem('rawEssexUserId');
+            if (!userId) {
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('rawEssexUserId', userId);
+            }
+            return userId;
+        }
+
+        // Load cart items
+        async function loadCart() {
+            const userId = getUserId();
+            try {
+                const response = await fetch(`/api/cart/${userId}`);
+                const cart = await response.json();
+                displayCart(cart);
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                document.getElementById('cart-content').innerHTML = '<p>Error loading cart. Please try again.</p>';
+            }
+        }
+
+        // Display cart items
+        function displayCart(cart) {
+            const cartContent = document.getElementById('cart-content');
+
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Your cart is empty</h3>
+                        <p>Add some delicious raw pet food to get started!</p>
+                        <a href="/products" class="continue-shopping">Continue Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let cartHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                cartHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image || '/images/default.jpg'}" alt="${item.name}">
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <div class="item-price">£${item.price.toFixed(2)} each</div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity('${item.productId}', ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                            <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateQuantity('${item.productId}', this.value)">
+                            <button class="quantity-btn" onclick="updateQuantity('${item.productId}', ${item.quantity + 1})">+</button>
+                        </div>
+                        <div class="item-total">£${itemTotal.toFixed(2)}</div>
+                        <button class="remove-btn" onclick="removeItem('${item.productId}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            cartHTML += `
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>£${total.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span>£${total >= 30 ? '0.00' : '3.99'}</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total:</span>
+                        <span>£${(total + (total >= 30 ? 0 : 3.99)).toFixed(2)}</span>
+                    </div>
+                    ${total < 30 ? '<p style="color: #e74c3c; font-size: 0.9rem; margin-top: 1rem;">Add £' + (30 - total).toFixed(2) + ' more for free shipping!</p>' : ''}
+                </div>
+                <div class="checkout-section">
+                    <button class="checkout-btn" onclick="proceedToCheckout()">
+                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+                    </button>
+                    <br><br>
+                    <a href="/products" class="continue-shopping">Continue Shopping</a>
+                </div>
+            `;
+
+            cartContent.innerHTML = cartHTML;
+        }
+
+        // Update item quantity
+        async function updateQuantity(productId, quantity) {
+            quantity = parseInt(quantity);
+            if (quantity < 1) return;
+
+            const userId = getUserId();
+            try {
+                const response = await fetch(`/api/cart/${userId}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: quantity
+                    })
+                });
+
+                if (response.ok) {
+                    loadCart(); // Reload cart
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+            }
+        }
+
+        // Remove item from cart
+        async function removeItem(productId) {
+            if (!confirm('Remove this item from your cart?')) return;
+
+            const userId = getUserId();
+            try {
+                const response = await fetch(`/api/cart/${userId}/remove/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadCart(); // Reload cart
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+            }
+        }
+
+        // Proceed to checkout
+        function proceedToCheckout() {
+            // For now, just show an alert. In a real implementation, this would redirect to a checkout page
+            alert('Checkout functionality coming soon! We\'ll redirect you to a secure payment page.');
+        }
+
+        // Load cart when page loads
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+</body>
+</html>

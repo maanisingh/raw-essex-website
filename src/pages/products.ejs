@@ -109,6 +109,94 @@
             gap: 3rem;
             margin-bottom: 4rem;
         }
+
+        .product-actions {
+            margin-top: 15px;
+        }
+
+        .add-to-cart-btn, .out-of-stock-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .add-to-cart-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .add-to-cart-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .out-of-stock-btn {
+            background: #9ca3af;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .cart-badge {
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .cart-notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border: 1px solid #22c55e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+
+        .cart-notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-content i {
+            color: #22c55e;
+            font-size: 1.2rem;
+        }
+
+        .notification-content a {
+            background: #22c55e;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
         .product-card {
             background: white;
             border-radius: 25px;
@@ -325,9 +413,17 @@
                             <h3><%= product.name %></h3>
                             <p class="product-description"><%= product.description %></p>
                             <div class="product-price">£<%= product.price.toFixed(2) %></div>
-                            <span class="product-status <%= product.status %>">
-                                <%= product.status.replace('_', ' ') %>
-                            </span>
+                            <div class="product-actions">
+                                <% if (product.status === 'in_stock') { %>
+                                    <button class="add-to-cart-btn" onclick="addToCart('<%= product.id %>', '<%= product.name.replace(/'/g, '\\'') %>', <%= product.price %>)">
+                                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                                    </button>
+                                <% } else { %>
+                                    <button class="out-of-stock-btn" disabled>
+                                        <i class="fas fa-exclamation-circle"></i> Out of Stock
+                                    </button>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                 <% }); %>
@@ -365,12 +461,121 @@
             }
         });
 
-        // Add to cart functionality (placeholder for now)
-        function addToCart(productId, productName, price) {
-            console.log('Adding to cart:', productId, productName, price);
-            // Will implement full cart functionality next
-            alert('Product added to cart! (Cart functionality coming soon)');
+        // Generate unique user ID if not exists
+        function getUserId() {
+            let userId = localStorage.getItem('rawEssexUserId');
+            if (!userId) {
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('rawEssexUserId', userId);
+            }
+            return userId;
         }
+
+        // Add to cart functionality
+        async function addToCart(productId, productName, price) {
+            const userId = getUserId();
+
+            try {
+                const response = await fetch(`/api/cart/${userId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showCartNotification(productName, result.cartCount);
+                    updateCartBadge(result.cartCount);
+                } else {
+                    alert('Failed to add product to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding product to cart');
+            }
+        }
+
+        // Show cart notification
+        function showCartNotification(productName, cartCount) {
+            // Remove existing notification if any
+            const existingNotification = document.querySelector('.cart-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${productName} added to cart!</span>
+                    <a href="/cart">View Cart (${cartCount})</a>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Update cart badge in navigation
+        function updateCartBadge(count) {
+            let badge = document.querySelector('.cart-badge');
+            if (!badge && count > 0) {
+                // Create badge if it doesn't exist
+                const cartLink = document.querySelector('a[href="/cart"]');
+                if (cartLink) {
+                    badge = document.createElement('span');
+                    badge.className = 'cart-badge';
+                    cartLink.appendChild(badge);
+                }
+            }
+
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        // Load cart count on page load
+        async function loadCartCount() {
+            const userId = getUserId();
+            try {
+                const response = await fetch(`/api/cart/${userId}`);
+                const cart = await response.json();
+                const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+                updateCartBadge(totalCount);
+            } catch (error) {
+                console.error('Error loading cart count:', error);
+            }
+        }
+
+        // Load cart count when page loads
+        document.addEventListener('DOMContentLoaded', loadCartCount);
     </script>
 </body>
 </html>
