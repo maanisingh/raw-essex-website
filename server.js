@@ -863,11 +863,11 @@ app.put('/admin/payments/:paymentId/status', (req, res) => {
   res.json({ success: true, payment });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Admin panel available at http://localhost:${PORT}/admin`);
-  console.log(`FAQ page available at http://localhost:${PORT}/faq`);
-  console.log(`Admin settings at http://localhost:${PORT}/admin/settings`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+  console.log(`Admin panel available at http://0.0.0.0:${PORT}/admin`);
+  console.log(`FAQ page available at http://0.0.0.0:${PORT}/faq`);
+  console.log(`Admin settings at http://0.0.0.0:${PORT}/admin/settings`);
   console.log(`Now featuring ${productList.length} premium products!`);
 });
 
