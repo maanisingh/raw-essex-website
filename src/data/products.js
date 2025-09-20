@@ -544,10 +544,10 @@ const products = [
   }
 ];
 
-// Import additional products
-const additionalProducts = require('./expanded-products');
+// Import complete Raw Essex catalog
+const { products: rawEssexCompleteProducts } = require('../../complete-raw-essex-products');
 
-// Combine all products
-const allProducts = [...products, ...additionalProducts];
+// Combine original products with complete Raw Essex catalog
+const allProducts = [...products, ...rawEssexCompleteProducts];
 
 module.exports = allProducts;
