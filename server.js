@@ -860,11 +860,129 @@ app.put('/admin/payments/:paymentId/status', (req, res) => {
   res.json({ success: true, payment });
 });
 
+// API endpoints for admin panel statistics
+app.get('/api/orders', (req, res) => {
+  res.json(Array.from(orders.values()));
+});
+
+app.get('/api/accounts', (req, res) => {
+  res.json(Array.from(users.values()));
+});
+
+app.get('/api/payments', (req, res) => {
+  res.json(Array.from(payments.values()));
+});
+
+// Simple Open Source Admin Panel Alternative
+app.get('/admin-panel', (req, res) => {
+  const adminHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raw Essex - Open Source Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-green-500">
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-green-800 mb-2">
+                        <i class="fas fa-leaf mr-3"></i>Raw Essex - Open Source Admin
+                    </h1>
+                    <p class="text-gray-600">Professional admin panel powered by open source technology</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold">Products</h3>
+                                <p class="text-3xl font-bold">${productList.length}</p>
+                            </div>
+                            <i class="fas fa-box text-3xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold">Orders</h3>
+                                <p class="text-3xl font-bold">${orders.length}</p>
+                            </div>
+                            <i class="fas fa-shopping-cart text-3xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold">Accounts</h3>
+                                <p class="text-3xl font-bold">${users.size}</p>
+                            </div>
+                            <i class="fas fa-users text-3xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold">Payments</h3>
+                                <p class="text-3xl font-bold">${payments.size}</p>
+                            </div>
+                            <i class="fas fa-credit-card text-3xl opacity-80"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-chart-line mr-2 text-green-600"></i>Quick Actions
+                        </h2>
+                        <div class="space-y-3">
+                            <a href="/admin" class="block bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-cogs mr-2"></i>Full Admin Panel
+                            </a>
+                            <a href="/products" class="block bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-eye mr-2"></i>View Products
+                            </a>
+                            <a href="/" class="block bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-home mr-2"></i>Back to Website
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-info-circle mr-2 text-blue-600"></i>System Info
+                        </h2>
+                        <div class="space-y-2 text-sm">
+                            <p><strong>Platform:</strong> Open Source Express.js</p>
+                            <p><strong>Status:</strong> <span class="text-green-600">Online</span></p>
+                            <p><strong>Payment System:</strong> Manual Cash</p>
+                            <p><strong>Total Features:</strong> Products, Orders, Accounts</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center text-gray-500">
+                    <p>Powered by Open Source Technology - Raw Essex Admin Panel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+  res.send(adminHtml);
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
-  console.log(`Admin panel available at http://0.0.0.0:${PORT}/admin`);
+  console.log(`Custom Admin Panel: http://0.0.0.0:${PORT}/admin`);
+  console.log(`OPEN SOURCE ADMIN: http://0.0.0.0:${PORT}/admin-panel`);
   console.log(`FAQ page available at http://0.0.0.0:${PORT}/faq`);
-  console.log(`Admin settings at http://0.0.0.0:${PORT}/admin/settings`);
   console.log(`Now featuring ${productList.length} premium products!`);
 });
 

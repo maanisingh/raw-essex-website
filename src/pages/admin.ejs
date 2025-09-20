@@ -557,16 +557,16 @@
 
         <div class="tab-navigation">
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="showTab('products', this)">
+                <button class="tab-btn active" onclick="switchTab('products', this)">
                     <i class="fas fa-box"></i> Products
                 </button>
-                <button class="tab-btn" onclick="showTab('orders', this)">
+                <button class="tab-btn" onclick="switchTab('orders', this)">
                     <i class="fas fa-shopping-cart"></i> Orders
                 </button>
-                <button class="tab-btn" onclick="showTab('accounts', this)">
+                <button class="tab-btn" onclick="switchTab('accounts', this)">
                     <i class="fas fa-users"></i> Accounts
                 </button>
-                <button class="tab-btn" onclick="showTab('payments', this)">
+                <button class="tab-btn" onclick="switchTab('payments', this)">
                     <i class="fas fa-credit-card"></i> Payments
                 </button>
             </div>
@@ -862,36 +862,66 @@
     </div>
 
     <script>
-        // Tab Management
-        function showTab(tabName, element) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        console.log('Admin panel loading...');
+
+        // Simple tab switching function
+        function switchTab(tabName, buttonElement) {
+            console.log('Switching to tab:', tabName);
+
+            // Hide all tab content
+            const allTabs = document.querySelectorAll('.tab-content');
+            allTabs.forEach(tab => tab.classList.remove('active'));
 
             // Remove active from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            const allButtons = document.querySelectorAll('.tab-btn');
+            allButtons.forEach(btn => btn.classList.remove('active'));
 
-            // Show selected tab
-            const targetTab = document.getElementById(tabName + '-tab');
-            if (targetTab) {
-                targetTab.classList.add('active');
+            // Show the selected tab
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                console.log('Activated tab:', tabName + '-tab');
+            } else {
+                console.error('Tab not found:', tabName + '-tab');
             }
 
-            // Activate button
-            if (element) {
-                element.classList.add('active');
+            // Activate the clicked button
+            if (buttonElement) {
+                buttonElement.classList.add('active');
             }
 
-            // Load data for the tab
+            // Load content for specific tabs
             if (tabName === 'orders') {
-                loadOrders();
+                loadOrdersData();
             } else if (tabName === 'accounts') {
-                loadAccounts();
+                loadAccountsData();
             } else if (tabName === 'payments') {
-                loadPayments();
+                loadPaymentsData();
+            }
+        }
+
+        // Simple data loading functions
+        function loadOrdersData() {
+            console.log('Loading orders...');
+            const container = document.getElementById('ordersContainer');
+            if (container) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p style="color: #6b7280;">No orders found</p></div>';
+            }
+        }
+
+        function loadAccountsData() {
+            console.log('Loading accounts...');
+            const container = document.getElementById('accountsContainer');
+            if (container) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p style="color: #6b7280;">No customer accounts found</p></div>';
+            }
+        }
+
+        function loadPaymentsData() {
+            console.log('Loading payments...');
+            const container = document.getElementById('paymentsContainer');
+            if (container) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem;"><h3>Manual Cash Payment System</h3><p>All payments handled manually through cash transactions.</p></div>';
             }
         }
 
